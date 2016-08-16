@@ -1,0 +1,64 @@
+#include <QFile>
+#include "server.h"
+#include <shared.h>
+#include <QString>
+
+Server::Server(QObject *parent) :
+    QTcpServer(parent)
+{
+    loadconfigFile();
+}
+
+void Server::loadconfigFile()
+{
+    int counter = 0;
+    QString in_line;
+
+    QFile file("BioAcqServer2016.conf");
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&file);
+
+        while(!in.atEnd())
+        {
+            in_line = in.readLine();
+
+            if(QString::compare(in_line.at(0), QString("#"), Qt::CaseInsensitive) == 0)
+             continue;
+            else
+            {
+                if(counter == 0)
+                {
+                    temp_path_global = in_line;
+                }
+                else
+                {
+                    output_path_global = in_line;
+                }
+                counter++;
+            }
+        }
+
+        qDebug() << "temp_path_global: " << temp_path_global;
+        qDebug() << "output_path_global: " << output_path_global;
+        file.close();
+    }
+}
+
+void Server::StartServer()
+{
+    if(listen(QHostAddress::Any,1234))
+    {
+        qDebug() << "Server Started";
+    }
+    else
+    {
+        qDebug() << "Server NOT Started!";
+    }
+}
+
+void Server::incomingConnection(qintptr socketDescriptor)
+{
+    Client *client = new Client(this);
+    client->SetSocket(socketDescriptor);
+}
