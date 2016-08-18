@@ -19,11 +19,6 @@ public:
     void processData();
 
     /*!
-     * \brief setPassPhrase
-     * \param passphrase
-     */
-    void setPassPhrase(QString passphrase);
-    /*!
      * \brief setSocketInput
      * \param socketNumber
      */
@@ -40,14 +35,14 @@ public:
      * \param repoFile
      * \return
      */
-    QString DecryptFolder(QString fileName, bool repoFile);
+    QString DecryptFolder(QString fileName, bool repoFile, QByteArray passphrase);
 
     /*!
      * \brief EncryptFolder
      * \param inputFileName
      * \param outputFileName
      */
-    void EncryptFolder(QString inputFileName, QString outputFileName);
+    void EncryptFolder(QString inputFileName, QString outputFileName, QByteArray passphrase);
 
     /*!
      * \brief CompressDir
@@ -69,6 +64,14 @@ public:
      * \param isDir
      */
     void deleteFile(QString fileName, bool isDir);
+
+    /*!
+     * \brief mergeFolders - Recursive Function!
+     * \param fileName
+     * \param inputFilePath
+     * \param outputFilePath
+     */
+    void mergeFolders(QString fileName, QString inputFilePath, QString outputFilePath);
 signals:
     /*!
      * \brief completed
@@ -86,7 +89,6 @@ private:
     QDir temp_del_dir_;
     int socket_number_;
     Encrypto encryptor_;
-    QString passphrase_;
 
 };
 

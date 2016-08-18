@@ -15,10 +15,10 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -I../../../Qt/5.3/gcc_64/mkspecs/linux-g++ -I. -I../../../Libraries/OpenSSL_Compiled/include -I../Zipper/Include -I../../../Qt/5.3/gcc_64/include -I../../../Qt/5.3/gcc_64/include/QtNetwork -I../../../Qt/5.3/gcc_64/include/QtCore -I.
+INCPATH       = -I../../../Qt/5.3/gcc_64/mkspecs/linux-g++ -I. -I../../../Libraries/OpenSSL_Compiled/include -IZipper/Include -I../../../Qt/5.3/gcc_64/include -I../../../Qt/5.3/gcc_64/include/QtNetwork -I../../../Qt/5.3/gcc_64/include/QtCore -I.
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/esaith/Qt/5.3/gcc_64 -Wl,-rpath,/home/esaith/Qt/5.3/gcc_64/lib
-LIBS          = $(SUBLIBS) /home/esaith/Libraries/OpenSSL_Compiled/lib/libcrypto.so /home/esaith/Libraries/OpenSSL_Compiled/lib/libssl.so -L/home/esaith/Documents/BioAcqServer2016/Zipper/Libraries -lz -L/home/esaith/Qt/5.3/gcc_64/lib -lQt5Network -lQt5Core -lpthread 
+LIBS          = $(SUBLIBS) /home/esaith/Libraries/OpenSSL_Compiled/lib/libcrypto.so /home/esaith/Libraries/OpenSSL_Compiled/lib/libssl.so -L/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Libraries -lz -L/home/esaith/Qt/5.3/gcc_64/lib -lQt5Network -lQt5Core -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /home/esaith/Qt/5.3/gcc_64/bin/qmake
@@ -51,19 +51,19 @@ SOURCES       = main.cpp \
 		task.cpp \
 		shared.cpp \
 		encrypto.cpp \
-		../Zipper/Include/JlCompress.cpp \
-		../Zipper/Include/qioapi.cpp \
-		../Zipper/Include/quaadler32.cpp \
-		../Zipper/Include/quacrc32.cpp \
-		../Zipper/Include/quagzipfile.cpp \
-		../Zipper/Include/quaziodevice.cpp \
-		../Zipper/Include/quazip.cpp \
-		../Zipper/Include/quazipdir.cpp \
-		../Zipper/Include/quazipfile.cpp \
-		../Zipper/Include/quazipfileinfo.cpp \
-		../Zipper/Include/quazipnewinfo.cpp \
-		../Zipper/Include/unzip.c \
-		../Zipper/Include/zip.c moc_server.cpp \
+		Zipper/Include/JlCompress.cpp \
+		Zipper/Include/qioapi.cpp \
+		Zipper/Include/quaadler32.cpp \
+		Zipper/Include/quacrc32.cpp \
+		Zipper/Include/quagzipfile.cpp \
+		Zipper/Include/quaziodevice.cpp \
+		Zipper/Include/quazip.cpp \
+		Zipper/Include/quazipdir.cpp \
+		Zipper/Include/quazipfile.cpp \
+		Zipper/Include/quazipfileinfo.cpp \
+		Zipper/Include/quazipnewinfo.cpp \
+		Zipper/Include/unzip.c \
+		Zipper/Include/zip.c moc_server.cpp \
 		moc_client.cpp \
 		moc_task.cpp \
 		moc_quagzipfile.cpp \
@@ -205,19 +205,19 @@ DIST          = ../../../Qt/5.3/gcc_64/mkspecs/features/spec_pre.prf \
 		task.cpp \
 		shared.cpp \
 		encrypto.cpp \
-		../Zipper/Include/JlCompress.cpp \
-		../Zipper/Include/qioapi.cpp \
-		../Zipper/Include/quaadler32.cpp \
-		../Zipper/Include/quacrc32.cpp \
-		../Zipper/Include/quagzipfile.cpp \
-		../Zipper/Include/quaziodevice.cpp \
-		../Zipper/Include/quazip.cpp \
-		../Zipper/Include/quazipdir.cpp \
-		../Zipper/Include/quazipfile.cpp \
-		../Zipper/Include/quazipfileinfo.cpp \
-		../Zipper/Include/quazipnewinfo.cpp \
-		../Zipper/Include/unzip.c \
-		../Zipper/Include/zip.c
+		Zipper/Include/JlCompress.cpp \
+		Zipper/Include/qioapi.cpp \
+		Zipper/Include/quaadler32.cpp \
+		Zipper/Include/quacrc32.cpp \
+		Zipper/Include/quagzipfile.cpp \
+		Zipper/Include/quaziodevice.cpp \
+		Zipper/Include/quazip.cpp \
+		Zipper/Include/quazipdir.cpp \
+		Zipper/Include/quazipfile.cpp \
+		Zipper/Include/quazipfileinfo.cpp \
+		Zipper/Include/quazipnewinfo.cpp \
+		Zipper/Include/unzip.c \
+		Zipper/Include/zip.c
 QMAKE_TARGET  = BioAcqServer2016
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = BioAcqServer2016
@@ -474,7 +474,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/BioAcqServer20161.0.0 || mkdir -p .tmp/BioAcqServer20161.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents server.h client.h task.h shared.h encrypto.h ../Zipper/Include/crypt.h ../Zipper/Include/ioapi.h ../Zipper/Include/JlCompress.h ../Zipper/Include/quaadler32.h ../Zipper/Include/quachecksum32.h ../Zipper/Include/quacrc32.h ../Zipper/Include/quagzipfile.h ../Zipper/Include/quaziodevice.h ../Zipper/Include/quazip.h ../Zipper/Include/quazip_global.h ../Zipper/Include/quazipdir.h ../Zipper/Include/quazipfile.h ../Zipper/Include/quazipfileinfo.h ../Zipper/Include/quazipnewinfo.h ../Zipper/Include/unzip.h ../Zipper/Include/zconf.h ../Zipper/Include/zip.h ../Zipper/Include/zlib.h .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents main.cpp server.cpp client.cpp task.cpp shared.cpp encrypto.cpp ../Zipper/Include/JlCompress.cpp ../Zipper/Include/qioapi.cpp ../Zipper/Include/quaadler32.cpp ../Zipper/Include/quacrc32.cpp ../Zipper/Include/quagzipfile.cpp ../Zipper/Include/quaziodevice.cpp ../Zipper/Include/quazip.cpp ../Zipper/Include/quazipdir.cpp ../Zipper/Include/quazipfile.cpp ../Zipper/Include/quazipfileinfo.cpp ../Zipper/Include/quazipnewinfo.cpp ../Zipper/Include/unzip.c ../Zipper/Include/zip.c .tmp/BioAcqServer20161.0.0/ && (cd `dirname .tmp/BioAcqServer20161.0.0` && $(TAR) BioAcqServer20161.0.0.tar BioAcqServer20161.0.0 && $(COMPRESS) BioAcqServer20161.0.0.tar) && $(MOVE) `dirname .tmp/BioAcqServer20161.0.0`/BioAcqServer20161.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BioAcqServer20161.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents server.h client.h task.h shared.h encrypto.h Zipper/Include/crypt.h Zipper/Include/ioapi.h Zipper/Include/JlCompress.h Zipper/Include/quaadler32.h Zipper/Include/quachecksum32.h Zipper/Include/quacrc32.h Zipper/Include/quagzipfile.h Zipper/Include/quaziodevice.h Zipper/Include/quazip.h Zipper/Include/quazip_global.h Zipper/Include/quazipdir.h Zipper/Include/quazipfile.h Zipper/Include/quazipfileinfo.h Zipper/Include/quazipnewinfo.h Zipper/Include/unzip.h Zipper/Include/zconf.h Zipper/Include/zip.h Zipper/Include/zlib.h .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents main.cpp server.cpp client.cpp task.cpp shared.cpp encrypto.cpp Zipper/Include/JlCompress.cpp Zipper/Include/qioapi.cpp Zipper/Include/quaadler32.cpp Zipper/Include/quacrc32.cpp Zipper/Include/quagzipfile.cpp Zipper/Include/quaziodevice.cpp Zipper/Include/quazip.cpp Zipper/Include/quazipdir.cpp Zipper/Include/quazipfile.cpp Zipper/Include/quazipfileinfo.cpp Zipper/Include/quazipnewinfo.cpp Zipper/Include/unzip.c Zipper/Include/zip.c .tmp/BioAcqServer20161.0.0/ && (cd `dirname .tmp/BioAcqServer20161.0.0` && $(TAR) BioAcqServer20161.0.0.tar BioAcqServer20161.0.0 && $(COMPRESS) BioAcqServer20161.0.0.tar) && $(MOVE) `dirname .tmp/BioAcqServer20161.0.0`/BioAcqServer20161.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BioAcqServer20161.0.0
 
 
 clean:compiler_clean 
@@ -626,7 +626,7 @@ moc_server.cpp: client.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qhostaddress.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QAbstractSocket \
 		server.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/BioAcqServer2016/BioAcqServer2016 -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/BioAcqServer2016/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore server.h -o moc_server.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore server.h -o moc_server.cpp
 
 moc_client.cpp: task.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDir \
@@ -749,7 +749,7 @@ moc_client.cpp: task.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QList \
 		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		client.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/BioAcqServer2016/BioAcqServer2016 -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/BioAcqServer2016/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore client.h -o moc_client.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore client.h -o moc_client.cpp
 
 moc_task.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
@@ -863,7 +863,7 @@ moc_task.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
 		task.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/BioAcqServer2016/BioAcqServer2016 -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/BioAcqServer2016/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore task.h -o moc_task.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore task.h -o moc_task.cpp
 
 moc_quagzipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -915,11 +915,11 @@ moc_quagzipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/quagzipfile.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/BioAcqServer2016/BioAcqServer2016 -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/BioAcqServer2016/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore ../Zipper/Include/quagzipfile.h -o moc_quagzipfile.cpp
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/quagzipfile.h
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quagzipfile.h -o moc_quagzipfile.cpp
 
 moc_quaziodevice.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -971,11 +971,11 @@ moc_quaziodevice.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/quaziodevice.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/BioAcqServer2016/BioAcqServer2016 -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/BioAcqServer2016/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore ../Zipper/Include/quaziodevice.h -o moc_quaziodevice.cpp
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/quaziodevice.h
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quaziodevice.h -o moc_quaziodevice.cpp
 
 moc_quazipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -1027,8 +1027,8 @@ moc_quazipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/quazip.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazip.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QString \
 		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
@@ -1038,12 +1038,12 @@ moc_quazipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
 		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
-		../Zipper/Include/zip.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/unzip.h \
-		../Zipper/Include/quazipfileinfo.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
@@ -1054,9 +1054,9 @@ moc_quazipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
-		../Zipper/Include/quazipnewinfo.h \
-		../Zipper/Include/quazipfile.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/BioAcqServer2016/BioAcqServer2016 -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/BioAcqServer2016/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore ../Zipper/Include/quazipfile.h -o moc_quazipfile.cpp
+		Zipper/Include/quazipnewinfo.h \
+		Zipper/Include/quazipfile.h
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quazipfile.h -o moc_quazipfile.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1070,13 +1070,9 @@ compiler_clean: compiler_moc_header_clean
 
 ####### Compile
 
-main.o: main.cpp server.h \
-		client.h \
-		task.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/QDir \
-		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
+main.o: main.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDebug \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdebug.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qalgorithms.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
@@ -1105,21 +1101,23 @@ main.o: main.cpp server.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlist.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qnamespace.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qarraydata.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qfileinfo.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextstream.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnamespace.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qlist.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qalgorithms.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcoreevent.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qscopedpointer.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qmetatype.h \
@@ -1127,23 +1125,25 @@ main.o: main.cpp server.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qdatastream.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qregexp.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/QDebug \
-		../../../Qt/5.3/gcc_64/include/QtCore/qdebug.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qhash.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qmap.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qtextstream.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qlocale.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qvariant.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qvector.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qpoint.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qset.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		server.h \
+		client.h \
+		task.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QDir \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QObject \
 		../../../Qt/5.3/gcc_64/include/QtCore/QRunnable \
 		../../../Qt/5.3/gcc_64/include/QtCore/qrunnable.h \
@@ -1569,7 +1569,29 @@ task.o: task.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
-		shared.h
+		shared.h \
+		Zipper/Include/JlCompress.h \
+		Zipper/Include/quazip.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QString \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
+		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazipfileinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
+		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		Zipper/Include/quazipfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
+		Zipper/Include/quazipnewinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o task.o task.cpp
 
 shared.o: shared.cpp shared.h \
@@ -1732,8 +1754,8 @@ encrypto.o: encrypto.cpp encrypto.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o encrypto.o encrypto.cpp
 
-JlCompress.o: ../Zipper/Include/JlCompress.cpp ../Zipper/Include/JlCompress.h \
-		../Zipper/Include/quazip.h \
+JlCompress.o: Zipper/Include/JlCompress.cpp Zipper/Include/JlCompress.h \
+		Zipper/Include/quazip.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QString \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
@@ -1792,13 +1814,13 @@ JlCompress.o: ../Zipper/Include/JlCompress.cpp ../Zipper/Include/JlCompress.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
 		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
-		../Zipper/Include/zip.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/unzip.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/quazipfileinfo.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
@@ -1809,9 +1831,9 @@ JlCompress.o: ../Zipper/Include/JlCompress.cpp ../Zipper/Include/JlCompress.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
-		../Zipper/Include/quazipfile.h \
+		Zipper/Include/quazipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
-		../Zipper/Include/quazipnewinfo.h \
+		Zipper/Include/quazipnewinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfileinfo.h \
@@ -1826,12 +1848,12 @@ JlCompress.o: ../Zipper/Include/JlCompress.cpp ../Zipper/Include/JlCompress.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qpoint.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qset.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontiguouscache.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JlCompress.o ../Zipper/Include/JlCompress.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JlCompress.o Zipper/Include/JlCompress.cpp
 
-qioapi.o: ../Zipper/Include/qioapi.cpp ../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/quazip_global.h \
+qioapi.o: Zipper/Include/qioapi.cpp Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/quazip_global.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
@@ -1885,9 +1907,9 @@ qioapi.o: ../Zipper/Include/qioapi.cpp ../Zipper/Include/zlib.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QSaveFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qsavefile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qioapi.o ../Zipper/Include/qioapi.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qioapi.o Zipper/Include/qioapi.cpp
 
-quaadler32.o: ../Zipper/Include/quaadler32.cpp ../Zipper/Include/quaadler32.h \
+quaadler32.o: Zipper/Include/quaadler32.cpp Zipper/Include/quaadler32.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
@@ -1924,14 +1946,14 @@ quaadler32.o: ../Zipper/Include/quaadler32.cpp ../Zipper/Include/quaadler32.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
-		../Zipper/Include/quachecksum32.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quaadler32.o ../Zipper/Include/quaadler32.cpp
+		Zipper/Include/quachecksum32.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quaadler32.o Zipper/Include/quaadler32.cpp
 
-quacrc32.o: ../Zipper/Include/quacrc32.cpp ../Zipper/Include/quacrc32.h \
-		../Zipper/Include/quachecksum32.h \
+quacrc32.o: Zipper/Include/quacrc32.cpp Zipper/Include/quacrc32.h \
+		Zipper/Include/quachecksum32.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
@@ -1968,12 +1990,12 @@ quacrc32.o: ../Zipper/Include/quacrc32.cpp ../Zipper/Include/quacrc32.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quacrc32.o ../Zipper/Include/quacrc32.cpp
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quacrc32.o Zipper/Include/quacrc32.cpp
 
-quagzipfile.o: ../Zipper/Include/quagzipfile.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
+quagzipfile.o: Zipper/Include/quagzipfile.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -2025,14 +2047,14 @@ quagzipfile.o: ../Zipper/Include/quagzipfile.cpp ../../../Qt/5.3/gcc_64/include/
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../Zipper/Include/quagzipfile.h \
+		Zipper/Include/quagzipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quagzipfile.o ../Zipper/Include/quagzipfile.cpp
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quagzipfile.o Zipper/Include/quagzipfile.cpp
 
-quaziodevice.o: ../Zipper/Include/quaziodevice.cpp ../Zipper/Include/quaziodevice.h \
+quaziodevice.o: Zipper/Include/quaziodevice.cpp Zipper/Include/quaziodevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
@@ -2083,15 +2105,15 @@ quaziodevice.o: ../Zipper/Include/quaziodevice.cpp ../Zipper/Include/quaziodevic
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quaziodevice.o ../Zipper/Include/quaziodevice.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quaziodevice.o Zipper/Include/quaziodevice.cpp
 
-quazip.o: ../Zipper/Include/quazip.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
+quazip.o: Zipper/Include/quazip.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -2147,7 +2169,7 @@ quazip.o: ../Zipper/Include/quazip.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFi
 		../../../Qt/5.3/gcc_64/include/QtCore/QHash \
 		../../../Qt/5.3/gcc_64/include/QtCore/qhash.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
-		../Zipper/Include/quazip.h \
+		Zipper/Include/quazip.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QString \
 		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
@@ -2156,23 +2178,23 @@ quazip.o: ../Zipper/Include/quazip.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFi
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
 		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
-		../Zipper/Include/zip.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/unzip.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/quazipfileinfo.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer_impl.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazip.o ../Zipper/Include/quazip.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazip.o Zipper/Include/quazip.cpp
 
-quazipdir.o: ../Zipper/Include/quazipdir.cpp ../Zipper/Include/quazipdir.h \
-		../Zipper/Include/quazip.h \
+quazipdir.o: Zipper/Include/quazipdir.cpp Zipper/Include/quazipdir.h \
+		Zipper/Include/quazip.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QString \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
@@ -2231,13 +2253,13 @@ quazipdir.o: ../Zipper/Include/quazipdir.cpp ../Zipper/Include/quazipdir.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
 		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
-		../Zipper/Include/zip.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/unzip.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/quazipfileinfo.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
@@ -2256,9 +2278,9 @@ quazipdir.o: ../Zipper/Include/quazipdir.cpp ../Zipper/Include/quazipdir.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QSet \
 		../../../Qt/5.3/gcc_64/include/QtCore/qset.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QSharedData
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipdir.o ../Zipper/Include/quazipdir.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipdir.o Zipper/Include/quazipdir.cpp
 
-quazipfile.o: ../Zipper/Include/quazipfile.cpp ../Zipper/Include/quazipfile.h \
+quazipfile.o: Zipper/Include/quazipfile.cpp Zipper/Include/quazipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
@@ -2309,8 +2331,8 @@ quazipfile.o: ../Zipper/Include/quazipfile.cpp ../Zipper/Include/quazipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/quazip.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazip.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QString \
 		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
@@ -2320,12 +2342,12 @@ quazipfile.o: ../Zipper/Include/quazipfile.cpp ../Zipper/Include/quazipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
 		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
-		../Zipper/Include/zip.h \
-		../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/unzip.h \
-		../Zipper/Include/quazipfileinfo.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
@@ -2336,10 +2358,10 @@ quazipfile.o: ../Zipper/Include/quazipfile.cpp ../Zipper/Include/quazipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
-		../Zipper/Include/quazipnewinfo.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipfile.o ../Zipper/Include/quazipfile.cpp
+		Zipper/Include/quazipnewinfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipfile.o Zipper/Include/quazipfile.cpp
 
-quazipfileinfo.o: ../Zipper/Include/quazipfileinfo.cpp ../Zipper/Include/quazipfileinfo.h \
+quazipfileinfo.o: Zipper/Include/quazipfileinfo.cpp Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
@@ -2400,10 +2422,10 @@ quazipfileinfo.o: ../Zipper/Include/quazipfileinfo.cpp ../Zipper/Include/quazipf
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
-		../Zipper/Include/quazip_global.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipfileinfo.o ../Zipper/Include/quazipfileinfo.cpp
+		Zipper/Include/quazip_global.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipfileinfo.o Zipper/Include/quazipfileinfo.cpp
 
-quazipnewinfo.o: ../Zipper/Include/quazipnewinfo.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo \
+quazipnewinfo.o: Zipper/Include/quazipnewinfo.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
@@ -2457,7 +2479,7 @@ quazipnewinfo.o: ../Zipper/Include/quazipnewinfo.cpp ../../../Qt/5.3/gcc_64/incl
 		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
-		../Zipper/Include/quazipnewinfo.h \
+		Zipper/Include/quazipnewinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
@@ -2466,17 +2488,17 @@ quazipnewinfo.o: ../Zipper/Include/quazipnewinfo.cpp ../../../Qt/5.3/gcc_64/incl
 		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/QString \
-		../Zipper/Include/quazip_global.h \
-		../Zipper/Include/quazipfileinfo.h \
+		Zipper/Include/quazip_global.h \
+		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipnewinfo.o ../Zipper/Include/quazipnewinfo.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o quazipnewinfo.o Zipper/Include/quazipnewinfo.cpp
 
-unzip.o: ../Zipper/Include/unzip.c ../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/unzip.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/crypt.h \
-		../Zipper/Include/quazip_global.h \
+unzip.o: Zipper/Include/unzip.c Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/unzip.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/crypt.h \
+		Zipper/Include/quazip_global.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
@@ -2505,14 +2527,14 @@ unzip.o: ../Zipper/Include/unzip.c ../Zipper/Include/zlib.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o unzip.o ../Zipper/Include/unzip.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o unzip.o Zipper/Include/unzip.c
 
-zip.o: ../Zipper/Include/zip.c ../Zipper/Include/zlib.h \
-		../Zipper/Include/zconf.h \
-		../Zipper/Include/zip.h \
-		../Zipper/Include/ioapi.h \
-		../Zipper/Include/crypt.h \
-		../Zipper/Include/quazip_global.h \
+zip.o: Zipper/Include/zip.c Zipper/Include/zlib.h \
+		Zipper/Include/zconf.h \
+		Zipper/Include/zip.h \
+		Zipper/Include/ioapi.h \
+		Zipper/Include/crypt.h \
+		Zipper/Include/quazip_global.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
@@ -2541,7 +2563,7 @@ zip.o: ../Zipper/Include/zip.c ../Zipper/Include/zlib.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o zip.o ../Zipper/Include/zip.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o zip.o Zipper/Include/zip.c
 
 moc_server.o: moc_server.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_server.o moc_server.cpp

@@ -126,11 +126,9 @@ void Client::getEncryptedFiles(QByteArray data)
             //Time Consumer
             Task *mytask = new Task();
             mytask->setSocketInput(socket->socketDescriptor());
-            mytask->setPassPhrase("MDSBRMP");
             mytask->setAutoDelete(true);
             connect(mytask,SIGNAL(completed()),SLOT(TaskResult()), Qt::QueuedConnection);
             QThreadPool::globalInstance()->start(mytask);
-
         }
 
     }

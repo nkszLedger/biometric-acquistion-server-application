@@ -370,10 +370,12 @@ QByteArray Encrypto::readFile(QString fileName)
   QFile file(fileName);
   if(!file.open(QFile::ReadOnly))
   {
-    qDebug() << "Could not reading file";
+    qDebug() << "Could not read file:";
+    qDebug() << fileName;
 
     return data;
   }
+  qDebug() << "Reading File...";
 
   data = file.readAll();
   file.close();

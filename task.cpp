@@ -23,6 +23,65 @@ void Task::setSocketInput(int socketNumber)
     socket_number_ = socketNumber;
 }
 
+// Recursive function
+void Task::mergeFolders(QString fileName,\
+                        QString inputFilePath,\
+                        QString outputFilePath)
+{
+    QDir input_dir;
+
+    QString temp_file_name = "";
+    QFileInfo temp_input_file_info(inputFilePath   +"/" + fileName);
+    QFileInfo temp_output_file_info(outputFilePath +"/" + fileName);
+
+    if(temp_input_file_info.isDir())
+    {
+        input_dir.setPath(inputFilePath   +"/" + fileName);
+
+        QStringList input_list = input_dir.entryList();
+
+        for(int i = 0; i < input_list.size(); i++)
+        {
+            temp_file_name = input_list.at(i);
+
+            if(temp_file_name == "." || temp_file_name == ".." )
+            {
+                continue;
+            }
+            else
+            {
+                if(temp_output_file_info.exists())
+                {
+                    mergeFolders(temp_file_name, \
+                                      (inputFilePath  + "/" + fileName),\
+                                      (outputFilePath + "/" + fileName));
+                }
+                else if((!temp_output_file_info.exists()) || temp_input_file_info.isFile())
+                {
+                    // move folder to repo folder
+                    input_dir.rename((inputFilePath + "/" + fileName),
+                                     (outputFilePath+ "/" + fileName));
+                }
+
+            }
+        }
+    }
+    else if(temp_input_file_info.isFile())
+    {
+        // check if directory with same heading exists in repo folder
+        if(temp_output_file_info.exists())
+        {
+            // skip - cannot merge file, only directories
+        }
+        else
+        {
+            // move file to repo folder
+            input_dir.rename((inputFilePath + "/" + fileName),
+                             (outputFilePath+ "/" + fileName));
+        }
+    }
+}
+
 void Task::mergeFolders(QString inputFolderPath,\
                         QString existingFolderPath)
 {
@@ -49,6 +108,8 @@ void Task::mergeFolders(QString inputFolderPath,\
         }
         else
         {
+            qDebug() << "temp_file_name: " << temp_file_name;
+
             // set file name (new files)
             temp_file_info.setFile(inputFolderPath + "/" + temp_file_name);
 
@@ -114,14 +175,13 @@ void Task::DecompressDir(QString zipFile, QString directory)
     QStringList list = JlCompress::extractDir(zipFile, directory);
 }
 
-QString Task::DecryptFolder(QString fileName, bool repoFile)
+QString Task::DecryptFolder(QString fileName, bool repoFile, QByteArray passphrase)
 {
     // read in encrypted file
     QByteArray encrypted_file = encryptor_.readFile(fileName);
 
     //load passphrase
-    //    passphrase_ = decryptPassphrase();
-    QByteArray decrypted_file = encryptor_.decryptAES(passphrase_.toLatin1(), encrypted_file);
+    QByteArray decrypted_file = encryptor_.decryptAES(passphrase, encrypted_file);
 
     // new File name for decrypted folder
     QString new_file_name;
@@ -138,14 +198,14 @@ QString Task::DecryptFolder(QString fileName, bool repoFile)
 }
 
 void Task::EncryptFolder(QString inputFileName,\
-                         QString outputFileName)
+                         QString outputFileName,\
+                         QByteArray passphrase)
 {
     // read in encrypted file
     QByteArray file = encryptor_.readFile(inputFileName);
 
     //load passphrase
-    //    passphrase_ = decryptPassphrase();
-    QByteArray encrypted_file = encryptor_.encryptAES(passphrase_.toLatin1(), file, false);
+    QByteArray encrypted_file = encryptor_.encryptAES(passphrase, file, false);
 
     //write decrypted file
     encryptor_.writeFile(outputFileName, encrypted_file);
@@ -183,6 +243,14 @@ void Task::processData()
 
     QFile repo_file;
 
+    const bool isDir = true;
+
+    // get passphrase
+    // HEREP
+    RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
+    QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
+    QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
+
     for(int i = 0; i < new_files.size(); i++)
     {
         temp_file_name =  new_files.at(i);
@@ -195,69 +263,119 @@ void Task::processData()
         {
             original_file_name = new_files.at(i).split("#").at(1);
 
-            repo_file.setFileName(output_path_global + original_file_name);
-
-            if(repo_file.exists())
+            // check if dependency
+            if(original_file_name.contains(".dependency_"))
             {
-
-                // if exists
-                // decrypt folder on repo
-                repo_decrypt_file_name = DecryptFolder(output_path_global + original_file_name, true);
-
-
-                //unzip existing file
-                repo_decompressed_file_name = repo_decrypt_file_name+"_decompressed";
-                DecompressDir(repo_decrypt_file_name, repo_decompressed_file_name);
-
-                // decrypt new folder
-                new_decrypt_file_name = DecryptFolder(temp_dir_.absolutePath() + "/" + new_files.at(i), false);
-
-
-                //unzip new file
-                new_decompressed_file_name = new_decrypt_file_name+"_decompressed";
-                DecompressDir(new_decrypt_file_name, new_decompressed_file_name);
-
-
-                // merge folders
-                mergeFolders(new_decompressed_file_name, repo_decompressed_file_name);
-
-
-                // compress folder
-                temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
-                CompressDir(temp_merged_file_name, repo_decompressed_file_name);
-
-
-                // remove temporay files
-                deleteFile(repo_decrypt_file_name, false);
-                deleteFile(repo_decompressed_file_name, true);
-                deleteFile(new_decrypt_file_name, false);
-                deleteFile(new_decompressed_file_name, true);
-                deleteFile(output_path_global + original_file_name, false);
-                deleteFile(temp_dir_.absolutePath() + "/" + new_files.at(i), false);
-
-                // encrypt
-                EncryptFolder(temp_merged_file_name, (output_path_global + original_file_name));
-
-                // delete zip file only after encryption [Others must be deleted before]
-                deleteFile(temp_merged_file_name, false);
-
-                // send signal of completion
-                qDebug() << "About to emit";
-                emit completed();
-
+                qDebug() << "--SKIPPING... " << new_files.at(i);
+                // skip
             }
             else
             {
-                // move to repo folder
-                temp_dir_.rename(temp_file_name, (output_path_global + original_file_name));
+                repo_file.setFileName(output_path_global + original_file_name);
+
+                if(repo_file.exists())
+                {
+                    qDebug() << "--FODLER EXISTS!!!!!" << new_files.at(i);
+
+                    // if exists
+                    // decrypt folder on repo
+                    repo_decrypt_file_name = DecryptFolder(output_path_global + original_file_name, \
+                                                           true,\
+                                                           repo_folder_key);
+
+
+                    //unzip existing file
+                    repo_decompressed_file_name = repo_decrypt_file_name+"_decompressed";
+                    DecompressDir(repo_decrypt_file_name, repo_decompressed_file_name);
+
+
+                    // decrypt new folder
+                    // get passphrase
+                    QString dependency_file_name = new_files[i];
+                    dependency_file_name.remove(".zip");
+                    dependency_file_name.insert(0, temp_dir_.absolutePath() + "/");
+                    dependency_file_name.append(".dependency_");
+                    QByteArray temp_folder_data = encryptor_.readFile(dependency_file_name);
+                    QByteArray temp_folder_key = encryptor_.decryptRSA(pvt_key, temp_folder_data);
+
+                    new_decrypt_file_name = DecryptFolder(temp_dir_.absolutePath() + "/" + new_files.at(i),\
+                                                          false,\
+                                                          temp_folder_key);
+
+
+                    //unzip new file
+                    new_decompressed_file_name = new_decrypt_file_name+"_decompressed";
+                    DecompressDir(new_decrypt_file_name, new_decompressed_file_name);
+
+
+                    // merge folders
+                    mergeFolders(new_decompressed_file_name, repo_decompressed_file_name);
+
+                    qDebug() << "repo_decompressed_file_name: " << repo_decompressed_file_name;
+
+
+                    // compress folder
+                    temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
+                    CompressDir(temp_merged_file_name, repo_decompressed_file_name);
+
+
+                    // remove temporay files
+                    deleteFile(dependency_file_name,                             !isDir);
+                    deleteFile(new_decrypt_file_name,                            !isDir);
+                    deleteFile(repo_decrypt_file_name,                           !isDir);
+                    deleteFile(output_path_global + original_file_name,          !isDir);
+                    deleteFile(temp_dir_.absolutePath() + "/" + new_files.at(i), !isDir);
+
+                    // delete temp directories
+                    deleteFile(new_decompressed_file_name,  isDir);
+                    deleteFile(repo_decompressed_file_name, isDir);
+
+                    // encrypt
+                    EncryptFolder(temp_merged_file_name, \
+                                  (output_path_global + original_file_name),\
+                                  repo_folder_key);
+
+                    // delete zip file only after encryption [Others must be deleted before]
+                    deleteFile(temp_merged_file_name, false);
+
+                    // send signal of completion
+                    emit completed();
+
+
+                }
+                else
+                {
+                    // decrypt temp folder using given key
+                    QString dependency_file_name = new_files[i];
+                    dependency_file_name.remove(".zip");
+                    dependency_file_name.insert(0, temp_dir_.absolutePath() + "/");
+                    dependency_file_name.append(".dependency_");
+
+                    QByteArray temp_folder_data = encryptor_.readFile(dependency_file_name);
+                    QByteArray temp_folder_key = encryptor_.decryptRSA(pvt_key, temp_folder_data);
+
+                    new_decrypt_file_name = DecryptFolder(temp_dir_.absolutePath() + "/" + new_files.at(i),\
+                                                          false,\
+                                                          temp_folder_key);
+
+
+                    // encrypt folder using repo key & move to repo folder
+                    EncryptFolder(new_decrypt_file_name, \
+                                  (output_path_global + original_file_name),\
+                                  repo_folder_key);
+
+                    // delete files
+                    deleteFile(temp_dir_.absolutePath() + "/" + new_files.at(i),        !isDir);
+                    deleteFile(dependency_file_name,   !isDir);
+                    deleteFile(new_decrypt_file_name,  !isDir);
+                }
             }
+
+
         }
 
 
     }
-}
-
-void Task::setPassPhrase(QString passphrase)
-{
-    passphrase_ = passphrase;
+    // free memory
+    encryptor_.freeRSAKey(pvt_key);
 }

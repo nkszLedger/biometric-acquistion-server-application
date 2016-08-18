@@ -35,8 +35,8 @@ HEADERS += \
 
 # -- Zip -- Library
 # is this needed or libs folder will suffice
-QUAZIPCODEDIR = "/home/esaith/Documents/BioAcqServer2016/Zipper/Include"
-ZLIBCODEDIR = "/home/esaith/Documents/BioAcqServer2016/Zipper/Libraries"
+QUAZIPCODEDIR = "/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include"
+ZLIBCODEDIR = "/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Libraries"
 
 unix{
   LIBS += -L$${ZLIBCODEDIR} -lz
