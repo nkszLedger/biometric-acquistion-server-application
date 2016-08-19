@@ -24,12 +24,6 @@ public:
      */
     void setSocketInput(int socketNumber);
     /*!
-     * \brief mergeFolders
-     * \param inputFolderPath
-     * \param existingFolderPath
-     */
-    void mergeFolders(QString inputFolderPath, QString existingFolderPath);
-    /*!
      * \brief DecryptFolder
      * \param fileName
      * \param repoFile

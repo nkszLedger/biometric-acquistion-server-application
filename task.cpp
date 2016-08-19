@@ -82,80 +82,6 @@ void Task::mergeFolders(QString fileName,\
     }
 }
 
-void Task::mergeFolders(QString inputFolderPath,\
-                        QString existingFolderPath)
-{
-    // check if file exist of repository
-    QDir input_folders_dir(inputFolderPath);
-
-    QDir input_files_dir;
-    QStringList input_files_list;
-
-    QStringList input_folder_list = input_folders_dir.entryList();
-
-    QString temp_str = "";
-    QString temp_file_name = "";
-    QFileInfo temp_file_info;
-    QFileInfo repo_folder;
-
-    for(int i = 0; i < input_folder_list.size(); i++)
-    {
-        temp_file_name =  input_folder_list.at(i);
-
-        if(temp_file_name == "." || temp_file_name == ".." )
-        {
-            continue;
-        }
-        else
-        {
-            qDebug() << "temp_file_name: " << temp_file_name;
-
-            // set file name (new files)
-            temp_file_info.setFile(inputFolderPath + "/" + temp_file_name);
-
-            // check if directory
-            if(temp_file_info.isDir())
-            {
-                // set folder name repo
-                repo_folder.setFile(existingFolderPath+"/"+temp_file_name);
-
-                // check if directory with same heading exists in repo folder
-                if(repo_folder.exists())
-                {
-                    // loop through all file in input file and move to repo folder
-                    input_files_list.clear();
-                    // get listings of files
-                    input_files_dir.setPath(inputFolderPath+"/"+temp_file_name);
-                    input_files_list =input_files_dir.entryList();
-
-                    for(int j = 0; j < input_files_list.size(); j++)
-                    {
-
-                        if(input_files_list.at(j) == "." || input_files_list.at(j)  == ".." )
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            // move file to repo folder
-                            input_files_dir.rename((inputFolderPath + "/" + temp_file_name + "/" + input_files_list.at(j)),
-                                                   (existingFolderPath+"/"+temp_file_name +"/"+ input_files_list.at(j)));
-                        }
-
-                    }
-                }
-                else
-                {
-                    // move entire folder to repo folder
-                    input_folders_dir.rename((inputFolderPath + "/" + temp_file_name),
-                                             (existingFolderPath+"/"+ temp_file_name));
-                }
-
-            }
-        }
-
-    }
-}
 
 void Task::CompressDir(QString zipFile, QString directory)
 {
@@ -242,6 +168,7 @@ void Task::processData()
     QString original_file_name = "";
 
     QFile repo_file;
+    QFileInfo temp_file;
 
     const bool isDir = true;
 
@@ -275,19 +202,15 @@ void Task::processData()
 
                 if(repo_file.exists())
                 {
-                    qDebug() << "--FODLER EXISTS!!!!!" << new_files.at(i);
-
                     // if exists
                     // decrypt folder on repo
                     repo_decrypt_file_name = DecryptFolder(output_path_global + original_file_name, \
                                                            true,\
                                                            repo_folder_key);
 
-
                     //unzip existing file
                     repo_decompressed_file_name = repo_decrypt_file_name+"_decompressed";
                     DecompressDir(repo_decrypt_file_name, repo_decompressed_file_name);
-
 
                     // decrypt new folder
                     // get passphrase
@@ -298,26 +221,25 @@ void Task::processData()
                     QByteArray temp_folder_data = encryptor_.readFile(dependency_file_name);
                     QByteArray temp_folder_key = encryptor_.decryptRSA(pvt_key, temp_folder_data);
 
-                    new_decrypt_file_name = DecryptFolder(temp_dir_.absolutePath() + "/" + new_files.at(i),\
+                     new_decrypt_file_name = DecryptFolder(temp_dir_.absolutePath() + "/" + new_files.at(i),\
                                                           false,\
                                                           temp_folder_key);
-
 
                     //unzip new file
                     new_decompressed_file_name = new_decrypt_file_name+"_decompressed";
                     DecompressDir(new_decrypt_file_name, new_decompressed_file_name);
 
+                    // get basename
+                    temp_file.setFile(original_file_name);
 
                     // merge folders
-                    mergeFolders(new_decompressed_file_name, repo_decompressed_file_name);
-
-                    qDebug() << "repo_decompressed_file_name: " << repo_decompressed_file_name;
-
+                    mergeFolders(temp_file.baseName(),\
+                                 new_decompressed_file_name,\
+                                 repo_decompressed_file_name);
 
                     // compress folder
                     temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
                     CompressDir(temp_merged_file_name, repo_decompressed_file_name);
-
 
                     // remove temporay files
                     deleteFile(dependency_file_name,                             !isDir);
