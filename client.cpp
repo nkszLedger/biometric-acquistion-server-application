@@ -7,14 +7,17 @@
 Client::Client(QObject *parent) :
     QObject(parent)
 {
+    // declaring thread pool for clients
     QThreadPool::globalInstance()->setMaxThreadCount(15);
 
+    // clear variables
     file_names_.clear();
     file_sizes_.clear();
 
+    // initialise
     no_files_ = 0;
-    size_counter = 0;
-    file_size_counter = 0;
+    size_counter_ = 0;
+    file_size_counter_ = 0;
     current_file_index_ = 0;
 
 }
@@ -64,6 +67,7 @@ void Client::getHeader(QString inLine)
     int index = 0;
     for(int i = 0; i < no_files_; i++)
     {
+        // Append data to lists
         file_names_.append(in_list.at(index));
         file_sizes_.append(in_list.at(index+1));
         index += 2;
@@ -78,6 +82,7 @@ void Client::getHeader(QString inLine)
 
 void Client::setFileName(int index)
 {
+    // sets the file name with appropriate file path at index specified
     current_file_name_ = temp_path_global;
     current_file_name_.append(QString("%1#").arg(socket->socketDescriptor()));
     current_file_name_.append(file_names_.at(index));
@@ -86,44 +91,42 @@ void Client::setFileName(int index)
 void Client::getEncryptedFiles(QByteArray data)
 {
     // increment file size being recieved
-    file_size_counter += data.size();
+    file_size_counter_ += data.size();
 
-    // write file
+    // write file in append form
     QFile* entry = new QFile(current_file_name_);
     if(entry->open(QIODevice::Append))
     {
+        // write to file
         entry->write(data);
         entry->close();
     }
+    // delete memory
     delete entry;
 
     // check if file is complete
-    if(QString::compare(QString("%1").arg(file_size_counter), file_sizes_.at(current_file_index_), Qt::CaseInsensitive) == 0)
+    if(QString::compare(QString("%1").arg(file_size_counter_), file_sizes_.at(current_file_index_), Qt::CaseInsensitive) == 0)
     {
-        // reset file size counter
-        file_size_counter = 0;
+        // - reset file size counter
+        file_size_counter_ = 0;
 
-        qDebug() << "File completed: " << current_file_index_;
-
-        // increment index of files
+        // - increment index of files
         current_file_index_++;
 
-        // check if next file exists
+        // - check if next file exists
         if(current_file_index_ < file_sizes_.size())
         {
-            // - set file name to next
+            // -- set file name to next
             setFileName(current_file_index_);
 
-            // write to client of successful file recieved
+            // -- write to client of successful file recieved
             socket->write(QString("#!2").toStdString().c_str());
         }
         else
         {
-            qDebug() << "Transmission ended.. to decrypt and merge...";
-
             // in new thread
 
-            //Time Consumer
+            //Time Consumer Functionality
             Task *mytask = new Task();
             mytask->setSocketInput(socket->socketDescriptor());
             mytask->setAutoDelete(true);
@@ -144,13 +147,13 @@ void Client::readyRead()
     // check if Header (Meta Data)
     if(QString::compare(in_line.mid(0, 3), "#!1", Qt::CaseInsensitive) == 0)
     {
-        qDebug() << "HEADER...";
+        // - get header from client
         getHeader(in_line);
         return;
     }
     else
     {
-        // read data
+        // - read data
         getEncryptedFiles(data);
     }
 }
@@ -159,7 +162,5 @@ void Client::readyRead()
 
 void Client::TaskResult()
 {
-    qDebug() << "Completed Sending File (SLOT)";
-
     socket->write(QString("#!3").toStdString().c_str());
 }

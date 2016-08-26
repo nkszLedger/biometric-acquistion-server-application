@@ -11,11 +11,25 @@ class Server : public QTcpServer
 {
     Q_OBJECT
 public:
+    /*!
+     * \brief Server
+     * \param parent
+     */
     explicit Server(QObject *parent = 0);
+    /*!
+     * \brief loadconfigFile
+     */
     void loadconfigFile();
+    /*!
+     * \brief StartServer
+     */
     void StartServer();
 
 protected:
+    /*!
+     * \brief incomingConnection
+     * \param socketDescriptor
+     */
     void incomingConnection(qintptr socketDescriptor);
 
 signals:

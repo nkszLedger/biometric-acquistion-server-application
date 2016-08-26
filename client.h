@@ -14,33 +14,68 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
+    /*!
+     * \brief Client
+     * \param parent
+     */
     explicit Client(QObject *parent = 0);
 
+    /*!
+     * \brief SetSocket
+     * \param socketDescriptor
+     */
     void SetSocket(qintptr socketDescriptor);
 
+    /*!
+     * \brief getHeader
+     * \param inLine
+     */
     void getHeader(QString inLine);
 
+    /*!
+     * \brief getEncryptedFiles
+     * \param data
+     */
     void getEncryptedFiles(QByteArray data);
+
+    /*!
+     * \brief setFileName
+     * \param index
+     */
     void setFileName(int index);
 signals:
 
 public slots:
+    /*!
+     * \brief connected
+     */
     void connected();
+    /*!
+     * \brief disconnected
+     */
     void disconnected();
+    /*!
+     * \brief readyRead
+     */
     void readyRead();
+    /*!
+     * \brief TaskResult
+     */
     void TaskResult();
 
 private:
-    QTcpSocket *socket;
-
-    int size_counter;
+    QString current_file_name_;
 
     QStringList file_names_;
     QStringList file_sizes_;
+
+    QTcpSocket *socket;
+
+
     int no_files_;
-    int file_size_counter;
+    int size_counter_;
+    int file_size_counter_;
     int current_file_index_;
-    QString current_file_name_;
 
 };
 

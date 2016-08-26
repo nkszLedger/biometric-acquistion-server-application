@@ -6,6 +6,7 @@
 Server::Server(QObject *parent) :
     QTcpServer(parent)
 {
+    // load config file
     loadconfigFile();
 }
 
@@ -14,6 +15,7 @@ void Server::loadconfigFile()
     int counter = 0;
     QString in_line;
 
+    // load config file where executable resides
     QFile file("BioAcqServer2016.conf");
     if(file.open(QIODevice::ReadOnly))
     {
@@ -47,6 +49,7 @@ void Server::loadconfigFile()
 
 void Server::StartServer()
 {
+    //listen for incomming connections
     if(listen(QHostAddress::Any,1234))
     {
         qDebug() << "Server Started";
@@ -59,6 +62,8 @@ void Server::StartServer()
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
+    // create a new client
     Client *client = new Client(this);
+    // tag client to new id
     client->SetSocket(socketDescriptor);
 }
