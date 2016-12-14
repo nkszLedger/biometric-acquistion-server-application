@@ -264,9 +264,8 @@ void Task::processData()
                     deleteFile(temp_merged_file_name, false);
 
                     // ---- send signal of completion
+                    qDebug() << "Completed";
                     emit completed();
-
-
                 }
                 else
                 {
@@ -293,6 +292,9 @@ void Task::processData()
                     deleteFile(temp_dir_.absolutePath() + "/" + new_files.at(i),        !isDir);
                     deleteFile(dependency_file_name,   !isDir);
                     deleteFile(new_decrypt_file_name,  !isDir);
+
+                    qDebug() << "Completed";
+                    emit completed();
                 }
             }
 

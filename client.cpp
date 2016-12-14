@@ -8,7 +8,7 @@ Client::Client(QObject *parent) :
     QObject(parent)
 {
     // declaring thread pool for clients
-    QThreadPool::globalInstance()->setMaxThreadCount(15);
+    QThreadPool::globalInstance()->setMaxThreadCount(30);
 
     // clear variables
     file_names_.clear();
@@ -73,6 +73,12 @@ void Client::getHeader(QString inLine)
         index += 2;
     }
 
+
+    for(int i = 0; i < no_files_; i++)
+    {
+        qDebug() << i;
+        qDebug() << file_names_.at(i)<< " - " << file_sizes_.at(i);
+    }
     // set file name to first
     setFileName(0);
 
@@ -162,5 +168,6 @@ void Client::readyRead()
 
 void Client::TaskResult()
 {
+    qDebug() << "HERE 1";
     socket->write(QString("#!3").toStdString().c_str());
 }
