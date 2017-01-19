@@ -58,6 +58,7 @@ public slots:
      * \brief readyRead
      */
     void readyRead();
+
     /*!
      * \brief TaskResult
      */
@@ -77,6 +78,11 @@ private:
     int file_size_counter_;
     int current_file_index_;
 
+    /*!
+     * \brief retrieveRequestedBioModalities
+     * \param in_line
+     */
+    void retrieveRequestedBioModalities(QString in_line);
 };
 
 #endif // CLIENT_H

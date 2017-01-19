@@ -62,7 +62,7 @@ void Server::StartServer()
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
-    qDebug() << "socketDescriptor" << socketDescriptor;
+    qDebug() << "socketDescriptor - " << socketDescriptor;
     // create a new client
     Client *client = new Client(this);
     // tag client to new id

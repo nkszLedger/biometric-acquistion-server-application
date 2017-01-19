@@ -157,6 +157,16 @@ void Client::readyRead()
         getHeader(in_line);
         return;
     }
+    else if(QString::compare(in_line.mid(0, 3), "#!4", Qt::CaseInsensitive) == 0)
+    {
+        // - get header from client
+        //getHeader(in_line);
+        //return;
+
+        qDebug() <<" Client::readyRead() - Biometrics requested ";
+        qDebug() <<" Client::readyRead() - With header " << in_line;
+        retrieveRequestedBioModalities(in_line);
+    }
     else
     {
         // - read data
@@ -164,7 +174,25 @@ void Client::readyRead()
     }
 }
 
+void Client::retrieveRequestedBioModalities(QString in_line)
+{
+    /*
+     * Iris         - 1
+     * Fingerprints - 2
+     * Ear 2D       - 3
+     * Ear 3D       - 4
+     * Footprints   - 5
+     * Palmprints   - 6
+     */
 
+    int pass_header_index = 4;
+    // extract modality data
+    QString meta_data = in_line.mid(pass_header_index);
+    qDebug() << "Extracted meta_data \n" << meta_data;
+
+    QStringList requested_modalities_list = meta_data.split("#");
+    qDebug() << "Gather these modalities \n" << requested_modalities_list;
+}
 
 void Client::TaskResult()
 {
