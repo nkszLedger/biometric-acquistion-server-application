@@ -176,15 +176,6 @@ void Client::readyRead()
 
 void Client::retrieveRequestedBioModalities(QString in_line)
 {
-    /*
-     * Iris         - 1
-     * Fingerprints - 2
-     * Ear 2D       - 3
-     * Ear 3D       - 4
-     * Footprints   - 5
-     * Palmprints   - 6
-     */
-
     int pass_header_index = 4;
     // extract modality data
     QString meta_data = in_line.mid(pass_header_index);
@@ -192,6 +183,14 @@ void Client::retrieveRequestedBioModalities(QString in_line)
 
     QStringList requested_modalities_list = meta_data.split("#");
     qDebug() << "Gather these modalities \n" << requested_modalities_list;
+
+    //Time Consumer Functionality
+    Task *myTask = new Task();
+    myTask->setSocketInput(socket->socketDescriptor());
+    myTask->setAutoDelete(true);
+    myTask->setAutoRetrieve(requested_modalities_list,true);
+    connect(myTask,SIGNAL(completed()),SLOT(TaskResult()), Qt::QueuedConnection);
+    QThreadPool::globalInstance()->start(myTask);
 }
 
 void Client::TaskResult()

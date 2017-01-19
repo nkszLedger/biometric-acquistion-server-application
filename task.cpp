@@ -12,9 +12,24 @@ Task::Task()
 
 void Task::run()
 {
-    //time consumer
-    this->processData();
+    if( !auto_retrieve_ )
+        this->processData();
+    else
+        this->retrieveBiometricData();
 }
+
+bool Task::autoRetrieve() const
+{
+    return auto_retrieve_;
+}
+
+void Task::setAutoRetrieve( QStringList &requestedModalitiesList, \
+                            bool autoRetrieve )
+{
+    auto_retrieve_ = autoRetrieve;
+    requested_modalities_list_ = requestedModalitiesList;
+}
+
 
 void Task::setSocketInput(int socketNumber)
 {
@@ -152,6 +167,38 @@ void Task::deleteFile(QString fileName, bool isDir)
     else
     {
         temp_del_dir_.remove(fileName);
+    }
+}
+
+void Task::retrieveBiometricData()
+{
+    // assert Populated(requested_modalities_list_)
+    if( !requested_modalities_list_.isEmpty() )
+    {
+        for( int i = 0; i < requested_modalities_list_.size(); i++ )
+        {
+            traverseDirectory( requested_modalities_list_.at(i) );
+        }
+    }
+}
+
+void Task::traverseDirectory( QString modality )
+{
+    switch( modality.toInt() )
+    {
+        case IRIS:
+        break;
+        case FINGERPRINTS:
+        break;
+        case EAR2D:
+        break;
+        case EAR3D:
+        break;
+        case FOOTPRINTS:
+        break;
+        case PALMPRINTS:
+        break;
+
     }
 }
 
