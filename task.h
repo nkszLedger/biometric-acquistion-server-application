@@ -99,9 +99,11 @@ private:
     QDir temp_dir_;
     QDir temp_del_dir_;
     int socket_number_;
+    QString file_path_;
     bool auto_retrieve_;
     Encrypto encryptor_;
     QStringList requested_modalities_list_;
+    QString requested_modalities_dir_path_;
 
     /*!
      * \brief getRequesteModalities
@@ -111,12 +113,23 @@ private:
      * \brief retrieveBiometricData
      */
     void retrieveBiometricData();
+
+    /*!
+     * \brief packageAllRequestedModalities
+     */
+    void packageAllRequestedModalities();
     /*!
      * \brief traverseDirectory
      * \param modality
      */
     void traverseDirectory( QString modality );
-
+    /*!
+     * \brief copyDir
+     * \param source
+     * \param destination
+     * \param override
+     * \return
+     */
     bool copyDir(const QString source, const QString destination, const bool override);
 };
 

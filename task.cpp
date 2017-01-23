@@ -9,6 +9,9 @@ Task::Task()
     // set the paths for temporary directories and repo directory
     temp_dir_.setPath(temp_path_global);
     repo_dir_.setPath(output_path_global);
+
+    file_path_= "/home/esaith/Downloads/DATA";
+    requested_modalities_dir_path_ = file_path_ + "/requested_";
 }
 
 void Task::run()
@@ -174,6 +177,8 @@ void Task::deleteFile(QString fileName, bool isDir)
 void Task::retrieveBiometricData()
 {
     // assert Populated(requested_modalities_list_)
+    // traverse directory -  decrypts, decompresses and
+    // collects data to store modality corresponding 'requested' directories
     if( !requested_modalities_list_.isEmpty() )
     {
         for( int i = 0; i < requested_modalities_list_.size(); i++ )
@@ -181,6 +186,11 @@ void Task::retrieveBiometricData()
             traverseDirectory( requested_modalities_list_.at(i) );
         }
     }
+
+    // Check for empty 'requested data directories and remove
+    // Combine folders into one directory
+
+    packageAllRequestedModalities();
 }
 
 void Task::traverseDirectory( QString modality )
@@ -191,18 +201,15 @@ void Task::traverseDirectory( QString modality )
     QString repo_decompressed_file_name;
 
     QDirIterator *sub_directory_it;
-    QString file_path = "/home/esaith/Downloads/DATA";
-    QDirIterator file_path_it( file_path, QDir::Files);
-    QString requested_modalities_dir_path = file_path + "/requested_" + modality;
+    QString temp_requested_modalities_dir_path = requested_modalities_dir_path_+ modality;
+    QDirIterator file_path_it( file_path_, QDir::Files);
 
-    QDir requested_modalities(file_path);
-    requested_modalities.mkdir(requested_modalities_dir_path);
+    QDir requested_modalities(file_path_);
+    requested_modalities.mkdir(temp_requested_modalities_dir_path);
 
     RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
     QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
-
-
 
     // decrypt & decompress
     while (file_path_it.hasNext())
@@ -240,7 +247,7 @@ void Task::traverseDirectory( QString modality )
             if( path_info.last() == "Fingerprints" && modality.toInt() == FINGERPRINTS )
             {
                 copyDir( sub_dir_temp_path, \
-                         requested_modalities_dir_path , \
+                         temp_requested_modalities_dir_path, \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -248,7 +255,7 @@ void Task::traverseDirectory( QString modality )
             else if( path_info.last() == "Palmprints" && modality.toInt() == PALMPRINTS )
             {
                 copyDir( sub_dir_temp_path, \
-                         requested_modalities_dir_path , \
+                         temp_requested_modalities_dir_path  , \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -256,7 +263,7 @@ void Task::traverseDirectory( QString modality )
             else if( path_info.last() == "Iris" && modality.toInt() == IRIS )
             {
                 copyDir( sub_dir_temp_path, \
-                         requested_modalities_dir_path , \
+                         temp_requested_modalities_dir_path  , \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -264,7 +271,7 @@ void Task::traverseDirectory( QString modality )
             else if( path_info.last() == "Footprints" && modality.toInt() == FOOTPRINTS )
             {
                 copyDir( sub_dir_temp_path, \
-                         requested_modalities_dir_path , \
+                         temp_requested_modalities_dir_path  , \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -272,7 +279,7 @@ void Task::traverseDirectory( QString modality )
             else if( path_info.last() == "Ear2D" && modality.toInt() == EAR2D )
             {
                 copyDir( sub_dir_temp_path, \
-                         requested_modalities_dir_path , \
+                         temp_requested_modalities_dir_path  , \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -280,7 +287,7 @@ void Task::traverseDirectory( QString modality )
             else if( path_info.last() == "EAR3D" && modality.toInt() == EAR3D )
             {
                 copyDir( sub_dir_temp_path, \
-                         requested_modalities_dir_path , \
+                         temp_requested_modalities_dir_path  , \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -288,11 +295,35 @@ void Task::traverseDirectory( QString modality )
         }
     }
 }
-/*
- * if(QDir("/home/highlander/Desktop/dir").entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+
+
+void Task::packageAllRequestedModalities()
 {
-    QMessageBox::information(this,"Directory is empty","Empty!!!");
-}*/
+    QDirIterator *file_path_it = new QDirIterator( file_path_, \
+                                                   QStringList() << "requested_*");
+
+    while( file_path_it->hasNext() )
+    {
+        if(QDir(file_path_it->next()).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+        {
+            qDebug() << "Directory is empty","Empty!!!";
+        }
+        qDebug() << "packing...";
+    }
+
+
+    // ---- merge folders
+//    mergeFolders(temp_file.baseName(),\
+//                 new_decompressed_file_name,\
+//                 repo_decompressed_file_name);
+
+//    // ---- compress folder
+//    temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
+//    CompressDir(temp_merged_file_name, repo_decompressed_file_name);
+
+
+}
+
 void Task::processData()
 {
     QStringList new_files  = temp_dir_.entryList();
