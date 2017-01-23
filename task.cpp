@@ -2,6 +2,7 @@
 #include "task.h"
 #include "shared.h"
 #include <JlCompress.h>
+#include <QDirIterator>
 
 Task::Task()
 {
@@ -184,24 +185,114 @@ void Task::retrieveBiometricData()
 
 void Task::traverseDirectory( QString modality )
 {
-    switch( modality.toInt() )
-    {
-        case IRIS:
-        break;
-        case FINGERPRINTS:
-        break;
-        case EAR2D:
-        break;
-        case EAR3D:
-        break;
-        case FOOTPRINTS:
-        break;
-        case PALMPRINTS:
-        break;
+    QString temp_path;
+    QString sub_dir_temp_path;
+    QString repo_decrypt_file_name;
+    QString repo_decompressed_file_name;
 
+    QDirIterator *sub_directory_it;
+    QString file_path = "/home/esaith/Downloads/DATA";
+    QDirIterator file_path_it( file_path, QDir::Files);
+    QString requested_modalities_dir_path = file_path + "/requested_" + modality;
+
+    QDir requested_modalities(file_path);
+    requested_modalities.mkdir(requested_modalities_dir_path);
+
+    RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
+    QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
+    QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
+
+
+
+    // decrypt & decompress
+    while (file_path_it.hasNext())
+    {
+        temp_path = file_path_it.next();
+
+        repo_decrypt_file_name = DecryptFolder( temp_path, \
+                                                true,\
+                                                repo_folder_key);
+        // unzip existing file
+        repo_decompressed_file_name = repo_decrypt_file_name + "_decompressed";
+        DecompressDir(repo_decrypt_file_name, repo_decompressed_file_name);
+
+        // delete the repo decripted files only
+        deleteFile(repo_decrypt_file_name, false);
+
+        // traverse repo decompressed files
+        sub_directory_it = new QDirIterator( repo_decompressed_file_name,\
+                                             ( QDir::Dirs | \
+                                               QDir::NoDot | \
+                                               QDir::NoDotDot | \
+                                               QDir::NoDotAndDotDot \
+                                             ), \
+                                             QDirIterator::Subdirectories);
+
+        qDebug() << "Files Existing are - \n";
+        while( sub_directory_it->hasNext() )
+        {
+            sub_dir_temp_path = sub_directory_it->next();
+
+            QStringList path_info = sub_dir_temp_path.split("/");
+            qDebug() << path_info.last();
+
+            // Copy data to its corresponding directory";
+            if( path_info.last() == "Fingerprints" && modality.toInt() == FINGERPRINTS )
+            {
+                copyDir( sub_dir_temp_path, \
+                         requested_modalities_dir_path , \
+                         false);
+                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                         << sub_dir_temp_path;
+            }
+            else if( path_info.last() == "Palmprints" && modality.toInt() == PALMPRINTS )
+            {
+                copyDir( sub_dir_temp_path, \
+                         requested_modalities_dir_path , \
+                         false);
+                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                         << sub_dir_temp_path;
+            }
+            else if( path_info.last() == "Iris" && modality.toInt() == IRIS )
+            {
+                copyDir( sub_dir_temp_path, \
+                         requested_modalities_dir_path , \
+                         false);
+                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                         << sub_dir_temp_path;
+            }
+            else if( path_info.last() == "Footprints" && modality.toInt() == FOOTPRINTS )
+            {
+                copyDir( sub_dir_temp_path, \
+                         requested_modalities_dir_path , \
+                         false);
+                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                         << sub_dir_temp_path;
+            }
+            else if( path_info.last() == "Ear2D" && modality.toInt() == EAR2D )
+            {
+                copyDir( sub_dir_temp_path, \
+                         requested_modalities_dir_path , \
+                         false);
+                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                         << sub_dir_temp_path;
+            }
+            else if( path_info.last() == "EAR3D" && modality.toInt() == EAR3D )
+            {
+                copyDir( sub_dir_temp_path, \
+                         requested_modalities_dir_path , \
+                         false);
+                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                         << sub_dir_temp_path;
+            }
+        }
     }
 }
-
+/*
+ * if(QDir("/home/highlander/Desktop/dir").entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+{
+    QMessageBox::information(this,"Directory is empty","Empty!!!");
+}*/
 void Task::processData()
 {
     QStringList new_files  = temp_dir_.entryList();
@@ -353,3 +444,82 @@ void Task::processData()
     // free memory
     encryptor_.freeRSAKey(pvt_key);
 }
+
+bool Task::copyDir(const QString source, const QString destination, const bool override)
+{
+    QDir directory(source);
+    bool error = false;
+
+    if (!directory.exists()) {
+        return false;
+    }
+
+    QStringList dirs = directory.entryList(QDir::AllDirs | QDir::Hidden);
+    QStringList files = directory.entryList(QDir::Files | QDir::Hidden);
+
+    QList<QString>::iterator d,f;
+
+    for (d = dirs.begin(); d != dirs.end(); ++d) {
+        if ((*d) == "." || (*d) == "..") {
+            continue;
+        }
+
+        if (!QFileInfo(directory.path() + "/" + (*d)).isDir()) {
+            continue;
+        }
+
+        QDir temp(destination + "/" + (*d));
+        temp.mkpath(temp.path());
+
+        if (!copyDir(directory.path() + "/" + (*d), destination + "/" + (*d), override)) {
+            error = true;
+        }
+    }
+
+    for (f = files.begin(); f != files.end(); ++f) {
+        QFile tempFile(directory.path() + "/" + (*f));
+
+
+        if (QFileInfo(directory.path() + "/" + (*f)).isDir()) {
+            continue;
+        }
+
+        QFile destFile(destination + "/" + directory.relativeFilePath(tempFile.fileName()));
+
+        if (destFile.exists() && override) {
+            destFile.remove();
+        }
+
+        if (!tempFile.copy(destination + "/" + directory.relativeFilePath(tempFile.fileName()))) {
+            error = true;
+
+        }
+    }
+
+
+    return !error;
+}
+
+/*
+ *  switch( modality.toInt() )
+     {
+         case IRIS:
+         break;
+
+         case FINGERPRINTS:
+         break;
+
+         case EAR2D:
+         break;
+
+         case EAR3D:
+         break;
+
+         case FOOTPRINTS:
+         break;
+
+         case PALMPRINTS:
+         break;
+
+     }
+ */

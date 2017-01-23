@@ -104,10 +104,20 @@ private:
     QStringList requested_modalities_list_;
 
     /*!
+     * \brief getRequesteModalities
+     */
+    void getRequesteModalities();
+    /*!
      * \brief retrieveBiometricData
      */
     void retrieveBiometricData();
+    /*!
+     * \brief traverseDirectory
+     * \param modality
+     */
+    void traverseDirectory( QString modality );
 
+    bool copyDir(const QString source, const QString destination, const bool override);
 };
 
 #endif // TASK_H
