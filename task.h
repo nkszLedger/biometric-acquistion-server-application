@@ -116,8 +116,9 @@ private:
 
     /*!
      * \brief packageAllRequestedModalities
+     * \param modality
      */
-    void packageAllRequestedModalities();
+    void packageAllRequestedModalities(QString modality);
     /*!
      * \brief traverseDirectory
      * \param modality

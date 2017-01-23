@@ -184,13 +184,23 @@ void Task::retrieveBiometricData()
         for( int i = 0; i < requested_modalities_list_.size(); i++ )
         {
             traverseDirectory( requested_modalities_list_.at(i) );
+            // Check for empty 'requested data directories and remove
+            // Combine folders into one directory
+            packageAllRequestedModalities(requested_modalities_list_.at(i));
         }
     }
 
-    // Check for empty 'requested data directories and remove
-    // Combine folders into one directory
+    CompressDir("retrievedModalityData", file_path_ + "/requested_mods_combined");
 
-    packageAllRequestedModalities();
+     RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
+     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
+     QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
+
+     EncryptFolder(file_path_ + "/retrievedModalityData.zip", \
+                   file_path_ + "/retrievedModalityData.zip",
+                   repo_folder_data);
+
+
 }
 
 void Task::traverseDirectory( QString modality )
@@ -296,20 +306,33 @@ void Task::traverseDirectory( QString modality )
     }
 }
 
-
-void Task::packageAllRequestedModalities()
+void Task::packageAllRequestedModalities( QString modality )
 {
     QDirIterator *file_path_it = new QDirIterator( file_path_, \
                                                    QStringList() << "requested_*");
 
+    QDir requested_modalities(file_path_);
+    requested_modalities.mkdir(file_path_ + "/requested_mods_combined");
+
     while( file_path_it->hasNext() )
     {
-        if(QDir(file_path_it->next()).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+        QDir dir;
+
+        if( !dir.rename( file_path_it->next(), \
+                         file_path_ + "/requested_mods_combined/requested_" + modality))
         {
-            qDebug() << "Directory is empty","Empty!!!";
+            qDebug() << file_path_ + "/requested_mods_combined/requested_" + modality \
+                     << " - Movement failed??";
         }
-        qDebug() << "packing...";
     }
+//    while( file_path_it->hasNext() )
+//    {
+//        if(QDir(file_path_it->next()).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+//        {
+//            qDebug() << "Directory is empty","Empty!!!";
+//        }
+//        qDebug() << "packing...";
+//    }
 
 
     // ---- merge folders
