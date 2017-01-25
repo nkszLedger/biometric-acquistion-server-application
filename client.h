@@ -63,6 +63,11 @@ public slots:
      * \brief TaskResult
      */
     void TaskResult();
+    /*!
+     * \brief sendEncryptedFile
+     * \param requestedModalitiesFilePath
+     */
+    void sendEncryptedFile(QString requestedModalitiesFilePath);
 
 private:
     QString current_file_name_;
@@ -71,7 +76,6 @@ private:
     QStringList file_sizes_;
 
     QTcpSocket *socket;
-
 
     int no_files_;
     int size_counter_;
@@ -83,6 +87,7 @@ private:
      * \param in_line
      */
     void retrieveRequestedBioModalities(QString in_line);
+
 };
 
 #endif // CLIENT_H

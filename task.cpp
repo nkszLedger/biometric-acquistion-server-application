@@ -16,7 +16,7 @@ Task::Task()
 
 void Task::run()
 {
-    if( !auto_retrieve_ )
+    if( !auto_retrieve_  )
         this->processData();
     else
         this->retrieveBiometricData();
@@ -192,26 +192,44 @@ void Task::retrieveBiometricData()
 
     CompressDir("retrievedModalityData", file_path_ + "/requested_mods_combined");
 
-     RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
-     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
-     QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
+    RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
+    QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
+    QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
 
-     EncryptFolder(file_path_ + "/retrievedModalityData.zip", \
-                   file_path_ + "/retrievedModalityData.zip",
-                   repo_folder_data);
+    EncryptFolder(file_path_ + "/retrievedModalityData.zip", \
+               file_path_ + "/retrievedModalityData.zip",
+               repo_folder_key);
 
+    encryptor_.freeRSAKey(pvt_key);
+
+    QDirIterator *dir_it = new QDirIterator(file_path_);
+
+    while(dir_it->hasNext())
+    {
+        QString file_path_dir = dir_it->next();
+        if( file_path_dir == (file_path_ + "/requested_mods_combined") )
+        {
+            qDebug() << "Here mod1";
+            emit requestedModalitiesReady((file_path_ + "/requested_mods_combined"));
+            qDebug() << "Here mod2";
+        }
+    }
+
+    // free memory
+    delete dir_it;
 
 }
 
 void Task::traverseDirectory( QString modality )
 {
     QString temp_path;
+    unsigned int counter = 1;
     QString sub_dir_temp_path;
     QString repo_decrypt_file_name;
     QString repo_decompressed_file_name;
 
     QDirIterator *sub_directory_it;
-    QString temp_requested_modalities_dir_path = requested_modalities_dir_path_+ modality;
+    QString temp_requested_modalities_dir_path = file_path_ + "/" + getModalityName(modality);
     QDirIterator file_path_it( file_path_, QDir::Files);
 
     QDir requested_modalities(file_path_);
@@ -221,10 +239,14 @@ void Task::traverseDirectory( QString modality )
     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
     QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
 
+    encryptor_.freeRSAKey(pvt_key);
+
     // decrypt & decompress
     while (file_path_it.hasNext())
     {
         temp_path = file_path_it.next();
+        QStringList temp_path_info = temp_path.split("/");
+        QString participant_id = temp_path_info.last().split(".zip").first();
 
         repo_decrypt_file_name = DecryptFolder( temp_path, \
                                                 true,\
@@ -245,7 +267,15 @@ void Task::traverseDirectory( QString modality )
                                              ), \
                                              QDirIterator::Subdirectories);
 
-        qDebug() << "Files Existing are - \n";
+        // create directory for requested modality from participant
+        // QString participant_gender_and_dob = getGenderAndDOB( participant_id );
+        QDir modality_n( temp_requested_modalities_dir_path );
+        QString new_modality_dir_for_participant = temp_requested_modalities_dir_path + "/" \
+                                                    + getModalityName(modality) +"_"+ \
+                                                        QString::number(counter);
+
+        modality_n.mkdir( new_modality_dir_for_participant );
+
         while( sub_directory_it->hasNext() )
         {
             sub_dir_temp_path = sub_directory_it->next();
@@ -257,7 +287,7 @@ void Task::traverseDirectory( QString modality )
             if( path_info.last() == "Fingerprints" && modality.toInt() == FINGERPRINTS )
             {
                 copyDir( sub_dir_temp_path, \
-                         temp_requested_modalities_dir_path, \
+                         new_modality_dir_for_participant, \
                          false);
                 qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
                          << sub_dir_temp_path;
@@ -265,51 +295,72 @@ void Task::traverseDirectory( QString modality )
             else if( path_info.last() == "Palmprints" && modality.toInt() == PALMPRINTS )
             {
                 copyDir( sub_dir_temp_path, \
-                         temp_requested_modalities_dir_path  , \
+                         new_modality_dir_for_participant  , \
                          false);
-                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                qDebug() << "Task::traverseDirectory() - Copied palmprints @, " \
                          << sub_dir_temp_path;
             }
             else if( path_info.last() == "Iris" && modality.toInt() == IRIS )
             {
                 copyDir( sub_dir_temp_path, \
-                         temp_requested_modalities_dir_path  , \
+                         new_modality_dir_for_participant  , \
                          false);
-                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                qDebug() << "Task::traverseDirectory() - Copied iris @, " \
                          << sub_dir_temp_path;
             }
             else if( path_info.last() == "Footprints" && modality.toInt() == FOOTPRINTS )
             {
                 copyDir( sub_dir_temp_path, \
-                         temp_requested_modalities_dir_path  , \
+                         new_modality_dir_for_participant  , \
                          false);
-                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                qDebug() << "Task::traverseDirectory() - Copied footprints @, " \
                          << sub_dir_temp_path;
             }
             else if( path_info.last() == "Ear2D" && modality.toInt() == EAR2D )
             {
                 copyDir( sub_dir_temp_path, \
-                         temp_requested_modalities_dir_path  , \
+                         new_modality_dir_for_participant  , \
                          false);
-                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                qDebug() << "Task::traverseDirectory() - Copied ear2D @, " \
                          << sub_dir_temp_path;
             }
             else if( path_info.last() == "EAR3D" && modality.toInt() == EAR3D )
             {
                 copyDir( sub_dir_temp_path, \
-                         temp_requested_modalities_dir_path  , \
+                         new_modality_dir_for_participant  , \
                          false);
-                qDebug() << "Task::traverseDirectory() - Copied fingerprints @, " \
+                qDebug() << "Task::traverseDirectory() - Copied ear3D @, " \
                          << sub_dir_temp_path;
             }
         }
+        counter++;
+    }
+
+    // free memory
+    delete sub_directory_it;
+}
+
+QString Task::getModalityName(QString modality)
+{
+    switch( modality.toInt())
+    {
+        case EAR2D          : return "Ear2D";
+        break;
+        case EAR3D          : return "Ear3D";
+        break;
+        case FOOTPRINTS     : return "Footprints";
+        break;
+        case PALMPRINTS     : return "Palmprints";
+        break;
+        case FINGERPRINTS   : return "Fingerprints";
+        break;
     }
 }
 
 void Task::packageAllRequestedModalities( QString modality )
 {
     QDirIterator *file_path_it = new QDirIterator( file_path_, \
-                                                   QStringList() << "requested_*");
+                                                   QStringList() << getModalityName(modality));
 
     QDir requested_modalities(file_path_);
     requested_modalities.mkdir(file_path_ + "/requested_mods_combined");
@@ -319,32 +370,15 @@ void Task::packageAllRequestedModalities( QString modality )
         QDir dir;
 
         if( !dir.rename( file_path_it->next(), \
-                         file_path_ + "/requested_mods_combined/requested_" + modality))
+                         file_path_ + "/requested_mods_combined/" + getModalityName(modality)))
         {
-            qDebug() << file_path_ + "/requested_mods_combined/requested_" + modality \
+            qDebug() << file_path_ + "/requested_mods_combined/" + getModalityName(modality) \
                      << " - Movement failed??";
         }
     }
-//    while( file_path_it->hasNext() )
-//    {
-//        if(QDir(file_path_it->next()).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
-//        {
-//            qDebug() << "Directory is empty","Empty!!!";
-//        }
-//        qDebug() << "packing...";
-//    }
 
-
-    // ---- merge folders
-//    mergeFolders(temp_file.baseName(),\
-//                 new_decompressed_file_name,\
-//                 repo_decompressed_file_name);
-
-//    // ---- compress folder
-//    temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
-//    CompressDir(temp_merged_file_name, repo_decompressed_file_name);
-
-
+    // free memory
+    delete file_path_it;
 }
 
 void Task::processData()
@@ -489,11 +523,7 @@ void Task::processData()
                     emit completed();
                 }
             }
-
-
         }
-
-
     }
     // free memory
     encryptor_.freeRSAKey(pvt_key);
@@ -549,31 +579,5 @@ bool Task::copyDir(const QString source, const QString destination, const bool o
 
         }
     }
-
-
     return !error;
 }
-
-/*
- *  switch( modality.toInt() )
-     {
-         case IRIS:
-         break;
-
-         case FINGERPRINTS:
-         break;
-
-         case EAR2D:
-         break;
-
-         case EAR3D:
-         break;
-
-         case FOOTPRINTS:
-         break;
-
-         case PALMPRINTS:
-         break;
-
-     }
- */

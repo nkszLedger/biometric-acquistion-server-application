@@ -3,6 +3,7 @@
 #include "client.h"
 #include <shared.h>
 #include <QFileInfo>
+#include <task.h>
 
 Client::Client(QObject *parent) :
     QObject(parent)
@@ -18,8 +19,7 @@ Client::Client(QObject *parent) :
     no_files_ = 0;
     size_counter_ = 0;
     file_size_counter_ = 0;
-    current_file_index_ = 0;
-
+    current_file_index_ = 0;   
 }
 
 void Client::SetSocket(qintptr socketDescriptor)
@@ -111,7 +111,9 @@ void Client::getEncryptedFiles(QByteArray data)
     delete entry;
 
     // check if file is complete
-    if(QString::compare(QString("%1").arg(file_size_counter_), file_sizes_.at(current_file_index_), Qt::CaseInsensitive) == 0)
+    if(QString::compare( QString("%1").arg(file_size_counter_), \
+                         file_sizes_.at(current_file_index_), \
+                         Qt::CaseInsensitive) == 0)
     {
         // - reset file size counter
         file_size_counter_ = 0;
@@ -185,16 +187,47 @@ void Client::retrieveRequestedBioModalities(QString in_line)
     qDebug() << "Gather these modalities \n" << requested_modalities_list;
 
     //Time Consumer Functionality
-    Task *myTask = new Task();
-    myTask->setSocketInput(socket->socketDescriptor());
-    myTask->setAutoDelete(true);
-    myTask->setAutoRetrieve(requested_modalities_list,true);
-    connect(myTask,SIGNAL(completed()),SLOT(TaskResult()), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(myTask);
+    Task *mytask = new Task();
+    mytask->setSocketInput(socket->socketDescriptor());
+    mytask->setAutoDelete(true);
+    mytask->setAutoRetrieve(requested_modalities_list,true);
+    connect( mytask, \
+             SIGNAL(requestedModalitiesReady(QString)), \
+             SLOT(sendEncryptedFile(QString)), Qt::QueuedConnection);
+
+    QThreadPool::globalInstance()->start(mytask);
 }
 
 void Client::TaskResult()
 {
     qDebug() << "HERE 1";
     socket->write(QString("#!3").toStdString().c_str());
+}
+
+void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
+{
+    QFile *requested_modalities_zip_file = new QFile(requestedModalitiesFilePath);
+
+    qDebug() << "HERE 1";
+    if( requested_modalities_zip_file->exists() )
+    {
+        qDebug() << "HERE 2";
+
+        if( requested_modalities_zip_file->readAll().isEmpty() )
+            qDebug() << "The byte array is empty";
+
+        qDebug() << "Client::sendEncryptedFile() - Status of socket " \
+                 << socket->write(requested_modalities_zip_file->readAll());
+
+        qDebug() << "HERE 3";
+    }
+
+    qDebug() << "HERE 4";
+    if( !socket->flush())
+        qDebug() << "Client::sendEncryptedFile() - Unable to flush...";
+    else
+        qDebug() << "Client::sendEncryptedFile() - Requested data sent";
+    qDebug() << "HERE 5";
+    // free memory
+    delete requested_modalities_zip_file;
 }

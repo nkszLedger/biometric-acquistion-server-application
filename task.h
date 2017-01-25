@@ -81,13 +81,16 @@ public:
      */
     void mergeFolders(QString fileName, QString inputFilePath, QString outputFilePath);
 
-
-
 signals:
     /*!
      * \brief completed
      */
     void completed();
+    /*!
+     * \brief requestedModalitiesReady
+     * \param requestedModalitiesfilePath
+     */
+    void requestedModalitiesReady(QString requestedModalitiesfilePath);
 
 public slots:
 
@@ -105,6 +108,12 @@ private:
     QStringList requested_modalities_list_;
     QString requested_modalities_dir_path_;
 
+    /*!
+     * \brief getModalityName
+     * \param modality
+     * \return
+     */
+    QString getModalityName(QString modality);
     /*!
      * \brief getRequesteModalities
      */
@@ -132,6 +141,7 @@ private:
      * \return
      */
     bool copyDir(const QString source, const QString destination, const bool override);
+
 };
 
 #endif // TASK_H
