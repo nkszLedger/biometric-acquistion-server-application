@@ -142,6 +142,12 @@ private:
      */
     bool copyDir(const QString source, const QString destination, const bool override);
 
+    /*!
+     * \brief getGenderAndDOB
+     * \param participant_id
+     * \return
+     */
+    QString getGenderAndDOB(QString participant_id);
 };
 
 #endif // TASK_H

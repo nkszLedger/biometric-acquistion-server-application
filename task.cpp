@@ -1,8 +1,15 @@
 #include <QDir>
 #include "task.h"
 #include "shared.h"
+#include <QVector>
+#include <QString>
+#include <QSqlRecord>
+#include <database.h>
 #include <JlCompress.h>
 #include <QDirIterator>
+#include <QSql>
+#include <QSqlDatabase>
+#include <sharedsettings.h>
 
 Task::Task()
 {
@@ -220,6 +227,31 @@ void Task::retrieveBiometricData()
 
 }
 
+void Task::packageAllRequestedModalities( QString modality )
+
+{
+    QDirIterator *file_path_it = new QDirIterator( file_path_, \
+                                                   QStringList() << getModalityName(modality));
+
+    QDir requested_modalities(file_path_);
+    requested_modalities.mkdir(file_path_ + "/requested_mods_combined");
+
+    while( file_path_it->hasNext() )
+    {
+        QDir dir;
+
+        if( !dir.rename( file_path_it->next(), \
+                         file_path_ + "/requested_mods_combined/" + getModalityName(modality)))
+        {
+            qDebug() << file_path_ + "/requested_mods_combined/" + getModalityName(modality) \
+                     << " - Movement failed??";
+        }
+    }
+
+    // free memory
+    delete file_path_it;
+}
+
 void Task::traverseDirectory( QString modality )
 {
     QString temp_path;
@@ -268,11 +300,11 @@ void Task::traverseDirectory( QString modality )
                                              QDirIterator::Subdirectories);
 
         // create directory for requested modality from participant
-        // QString participant_gender_and_dob = getGenderAndDOB( participant_id );
         QDir modality_n( temp_requested_modalities_dir_path );
         QString new_modality_dir_for_participant = temp_requested_modalities_dir_path + "/" \
                                                     + getModalityName(modality) +"_"+ \
-                                                        QString::number(counter);
+                                                        QString::number(counter) + \
+                                                            getGenderAndDOB( participant_id );
 
         modality_n.mkdir( new_modality_dir_for_participant );
 
@@ -357,29 +389,63 @@ QString Task::getModalityName(QString modality)
     }
 }
 
-void Task::packageAllRequestedModalities( QString modality )
+
+QString Task::getGenderAndDOB( QString participant_id )
 {
-    QDirIterator *file_path_it = new QDirIterator( file_path_, \
-                                                   QStringList() << getModalityName(modality));
+    Database *sourceDB;
+    sourceDB = new Database();
 
-    QDir requested_modalities(file_path_);
-    requested_modalities.mkdir(file_path_ + "/requested_mods_combined");
+    unsigned int first_index = 0;
+    QString dob;
+    QString gender;
+    QString table = "participant";
+    QVector<QString> column_list;
+    column_list.append("hashed_id");
 
-    while( file_path_it->hasNext() )
+    QVector<QString> value_list;
+    value_list.append(participant_id);
+
+    QVector<QString> select_list;
+    select_list.append("gender");
+    select_list.append("date_of_birth" );
+
+    QVector<QSqlRecord> result;
+    result.clear();
+
+    if(  sourceDB->connOpen() )
     {
-        QDir dir;
-
-        if( !dir.rename( file_path_it->next(), \
-                         file_path_ + "/requested_mods_combined/" + getModalityName(modality)))
+        if( !sourceDB->select( table, select_list, column_list, value_list, result ) )
         {
-            qDebug() << file_path_ + "/requested_mods_combined/" + getModalityName(modality) \
-                     << " - Movement failed??";
+            qDebug() << "Task::getGenderAndDOB() - Unable to query DB";
+            return "";
+        }
+        else
+        {
+            if( result.isEmpty() )
+            {
+                qDebug() << "Task::getGenderAndDOB() - No data found";
+                return "";
+            }
+            else
+            {
+                gender = result.at(first_index).field("gender").value().toString();
+                dob    = result.at(first_index).field("date_of_birth").value().toString();
+            }
         }
     }
+    else
+    {
+        qDebug() << "Task::getGenderAndDOB() - Unable to connect to DB";
+        return "";
+    }
 
-    // free memory
-    delete file_path_it;
+    sourceDB->connClosed();
+    delete sourceDB;
+
+    return gender + "#" +dob;
+
 }
+
 
 void Task::processData()
 {

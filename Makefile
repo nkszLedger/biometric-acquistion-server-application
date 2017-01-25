@@ -12,13 +12,13 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -I../../../Qt/5.3/gcc_64/mkspecs/linux-g++ -I. -I../../../Libraries/OpenSSL_Compiled/include -IZipper/Include -I../../../Qt/5.3/gcc_64/include -I../../../Qt/5.3/gcc_64/include/QtNetwork -I../../../Qt/5.3/gcc_64/include/QtCore -I.
+INCPATH       = -I../../../Qt/5.3/gcc_64/mkspecs/linux-g++ -I. -I../../../Libraries/OpenSSL_Compiled/include -IZipper/Include -I../../../Qt/5.3/gcc_64/include -I../../../Qt/5.3/gcc_64/include/QtNetwork -I../../../Qt/5.3/gcc_64/include/QtSql -I../../../Qt/5.3/gcc_64/include/QtCore -I.
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/esaith/Qt/5.3/gcc_64 -Wl,-rpath,/home/esaith/Qt/5.3/gcc_64/lib
-LIBS          = $(SUBLIBS) /home/esaith/Libraries/OpenSSL_Compiled/lib/libcrypto.so /home/esaith/Libraries/OpenSSL_Compiled/lib/libssl.so -L/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Libraries -lz -L/home/esaith/Qt/5.3/gcc_64/lib -lQt5Network -lQt5Core -lpthread 
+LIBS          = $(SUBLIBS) /home/esaith/Libraries/OpenSSL_Compiled/lib/libcrypto.so /home/esaith/Libraries/OpenSSL_Compiled/lib/libssl.so -L/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Libraries -lz -L/home/esaith/Qt/5.3/gcc_64/lib -lQt5Network -lQt5Sql -lQt5Core -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /home/esaith/Qt/5.3/gcc_64/bin/qmake
@@ -51,6 +51,8 @@ SOURCES       = main.cpp \
 		task.cpp \
 		shared.cpp \
 		encrypto.cpp \
+		database.cpp \
+		sharedsettings.cpp \
 		Zipper/Include/JlCompress.cpp \
 		Zipper/Include/qioapi.cpp \
 		Zipper/Include/quaadler32.cpp \
@@ -66,6 +68,8 @@ SOURCES       = main.cpp \
 		Zipper/Include/zip.c moc_server.cpp \
 		moc_client.cpp \
 		moc_task.cpp \
+		moc_database.cpp \
+		moc_sharedsettings.cpp \
 		moc_quagzipfile.cpp \
 		moc_quaziodevice.cpp \
 		moc_quazipfile.cpp
@@ -75,6 +79,8 @@ OBJECTS       = main.o \
 		task.o \
 		shared.o \
 		encrypto.o \
+		database.o \
+		sharedsettings.o \
 		JlCompress.o \
 		qioapi.o \
 		quaadler32.o \
@@ -91,6 +97,8 @@ OBJECTS       = main.o \
 		moc_server.o \
 		moc_client.o \
 		moc_task.o \
+		moc_database.o \
+		moc_sharedsettings.o \
 		moc_quagzipfile.o \
 		moc_quaziodevice.o \
 		moc_quazipfile.o
@@ -205,6 +213,8 @@ DIST          = ../../../Qt/5.3/gcc_64/mkspecs/features/spec_pre.prf \
 		task.cpp \
 		shared.cpp \
 		encrypto.cpp \
+		database.cpp \
+		sharedsettings.cpp \
 		Zipper/Include/JlCompress.cpp \
 		Zipper/Include/qioapi.cpp \
 		Zipper/Include/quaadler32.cpp \
@@ -357,7 +367,8 @@ Makefile: BioAcqServer2016.pro ../../../Qt/5.3/gcc_64/mkspecs/linux-g++/qmake.co
 		../../../Qt/5.3/gcc_64/mkspecs/features/lex.prf \
 		BioAcqServer2016.pro \
 		/home/esaith/Qt/5.3/gcc_64/lib/libQt5Network.prl \
-		/home/esaith/Qt/5.3/gcc_64/lib/libQt5Core.prl
+		/home/esaith/Qt/5.3/gcc_64/lib/libQt5Core.prl \
+		/home/esaith/Qt/5.3/gcc_64/lib/libQt5Sql.prl
 	$(QMAKE) -spec linux-g++ -o Makefile BioAcqServer2016.pro
 ../../../Qt/5.3/gcc_64/mkspecs/features/spec_pre.prf:
 ../../../Qt/5.3/gcc_64/mkspecs/common/shell-unix.conf:
@@ -467,6 +478,7 @@ Makefile: BioAcqServer2016.pro ../../../Qt/5.3/gcc_64/mkspecs/linux-g++/qmake.co
 BioAcqServer2016.pro:
 /home/esaith/Qt/5.3/gcc_64/lib/libQt5Network.prl:
 /home/esaith/Qt/5.3/gcc_64/lib/libQt5Core.prl:
+/home/esaith/Qt/5.3/gcc_64/lib/libQt5Sql.prl:
 qmake: FORCE
 	@$(QMAKE) -spec linux-g++ -o Makefile BioAcqServer2016.pro
 
@@ -474,7 +486,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/BioAcqServer20161.0.0 || mkdir -p .tmp/BioAcqServer20161.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents server.h client.h task.h shared.h encrypto.h Zipper/Include/crypt.h Zipper/Include/ioapi.h Zipper/Include/JlCompress.h Zipper/Include/quaadler32.h Zipper/Include/quachecksum32.h Zipper/Include/quacrc32.h Zipper/Include/quagzipfile.h Zipper/Include/quaziodevice.h Zipper/Include/quazip.h Zipper/Include/quazip_global.h Zipper/Include/quazipdir.h Zipper/Include/quazipfile.h Zipper/Include/quazipfileinfo.h Zipper/Include/quazipnewinfo.h Zipper/Include/unzip.h Zipper/Include/zconf.h Zipper/Include/zip.h Zipper/Include/zlib.h .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents main.cpp server.cpp client.cpp task.cpp shared.cpp encrypto.cpp Zipper/Include/JlCompress.cpp Zipper/Include/qioapi.cpp Zipper/Include/quaadler32.cpp Zipper/Include/quacrc32.cpp Zipper/Include/quagzipfile.cpp Zipper/Include/quaziodevice.cpp Zipper/Include/quazip.cpp Zipper/Include/quazipdir.cpp Zipper/Include/quazipfile.cpp Zipper/Include/quazipfileinfo.cpp Zipper/Include/quazipnewinfo.cpp Zipper/Include/unzip.c Zipper/Include/zip.c .tmp/BioAcqServer20161.0.0/ && (cd `dirname .tmp/BioAcqServer20161.0.0` && $(TAR) BioAcqServer20161.0.0.tar BioAcqServer20161.0.0 && $(COMPRESS) BioAcqServer20161.0.0.tar) && $(MOVE) `dirname .tmp/BioAcqServer20161.0.0`/BioAcqServer20161.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BioAcqServer20161.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents server.h client.h task.h shared.h encrypto.h database.h sharedsettings.h Zipper/Include/crypt.h Zipper/Include/ioapi.h Zipper/Include/JlCompress.h Zipper/Include/quaadler32.h Zipper/Include/quachecksum32.h Zipper/Include/quacrc32.h Zipper/Include/quagzipfile.h Zipper/Include/quaziodevice.h Zipper/Include/quazip.h Zipper/Include/quazip_global.h Zipper/Include/quazipdir.h Zipper/Include/quazipfile.h Zipper/Include/quazipfileinfo.h Zipper/Include/quazipnewinfo.h Zipper/Include/unzip.h Zipper/Include/zconf.h Zipper/Include/zip.h Zipper/Include/zlib.h .tmp/BioAcqServer20161.0.0/ && $(COPY_FILE) --parents main.cpp server.cpp client.cpp task.cpp shared.cpp encrypto.cpp database.cpp sharedsettings.cpp Zipper/Include/JlCompress.cpp Zipper/Include/qioapi.cpp Zipper/Include/quaadler32.cpp Zipper/Include/quacrc32.cpp Zipper/Include/quagzipfile.cpp Zipper/Include/quaziodevice.cpp Zipper/Include/quazip.cpp Zipper/Include/quazipdir.cpp Zipper/Include/quazipfile.cpp Zipper/Include/quazipfileinfo.cpp Zipper/Include/quazipnewinfo.cpp Zipper/Include/unzip.c Zipper/Include/zip.c .tmp/BioAcqServer20161.0.0/ && (cd `dirname .tmp/BioAcqServer20161.0.0` && $(TAR) BioAcqServer20161.0.0.tar BioAcqServer20161.0.0 && $(COMPRESS) BioAcqServer20161.0.0.tar) && $(MOVE) `dirname .tmp/BioAcqServer20161.0.0`/BioAcqServer20161.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BioAcqServer20161.0.0
 
 
 clean:compiler_clean 
@@ -497,9 +509,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_server.cpp moc_client.cpp moc_task.cpp moc_quagzipfile.cpp moc_quaziodevice.cpp moc_quazipfile.cpp
+compiler_moc_header_make_all: moc_server.cpp moc_client.cpp moc_task.cpp moc_database.cpp moc_sharedsettings.cpp moc_quagzipfile.cpp moc_quaziodevice.cpp moc_quazipfile.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_server.cpp moc_client.cpp moc_task.cpp moc_quagzipfile.cpp moc_quaziodevice.cpp moc_quazipfile.cpp
+	-$(DEL_FILE) moc_server.cpp moc_client.cpp moc_task.cpp moc_database.cpp moc_sharedsettings.cpp moc_quagzipfile.cpp moc_quaziodevice.cpp moc_quazipfile.cpp
 moc_server.cpp: client.h \
 		task.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDir \
@@ -613,6 +625,7 @@ moc_server.cpp: client.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpSocket \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -620,13 +633,12 @@ moc_server.cpp: client.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QList \
-		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpServer \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpserver.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qhostaddress.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QAbstractSocket \
 		server.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore server.h -o moc_server.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore server.h -o moc_server.cpp
 
 moc_client.cpp: task.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDir \
@@ -740,6 +752,7 @@ moc_client.cpp: task.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpSocket \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -747,9 +760,8 @@ moc_client.cpp: task.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QList \
-		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		client.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore client.h -o moc_client.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore client.h -o moc_client.cpp
 
 moc_task.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
@@ -862,8 +874,315 @@ moc_task.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		task.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore task.h -o moc_task.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore task.h -o moc_task.cpp
+
+moc_database.cpp: ../../../Qt/5.3/gcc_64/include/QtSql/QtSql \
+		../../../Qt/5.3/gcc_64/include/QtSql/QtSqlDepends \
+		../../../Qt/5.3/gcc_64/include/QtCore/QtCore \
+		../../../Qt/5.3/gcc_64/include/QtCore/QtCoreDepends \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypetraits.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qflags.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_mips.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_x86.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_unix.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qparallelanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpauseanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpropertyanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvariantanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeasingcurve.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvector.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpoint.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvariant.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdebug.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextstream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlocale.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qset.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsequentialanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qendian.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlibraryinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbuffer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdiriterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfileselector.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QObject \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfilesystemwatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlockfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qloggingcategory.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocess.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qresource.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsavefile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsettings.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstandardpaths.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtemporarydir.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QScopedPointer \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtemporaryfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qurl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qurlquery.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qidentityproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsortfilterproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlistmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonarray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonvalue.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsondocument.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstracteventdispatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractnativeeventfilter.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasictimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmath.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetaobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimedata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectcleanuphandler.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedmemory.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsignalmapper.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsocketnotifier.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemsemaphore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtranslator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qwineventnotifier.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimedatabase.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimetype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfactoryinterface.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlibrary.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qplugin.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpluginloader.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/quuid.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstracttransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeventtransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfinalstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhistorystate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsignaltransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstatemachine.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qexception.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuture.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfutureinterface.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrunnable.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qresultstore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuturesynchronizer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuturewatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qreadwritelock.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsemaphore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthreadstorage.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qwaitcondition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydataops.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydatapointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbitarray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearraymatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcache.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcollator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcommandlineoption.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcommandlineparser.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcryptographichash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qelapsedtimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qline.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlinkedlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmargins.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmessageauthenticationcode.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qqueue.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrect.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsize.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregularexpression.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedvaluerollback.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstack.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextboundaryfinder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimeline.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimezone.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qxmlstream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtcoreversion.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsql.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldatabase.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldriver.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldriverplugin.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlerror.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlfield.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlindex.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrecord.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlquery.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlresult.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlquerymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrelationaldelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qitemdelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qwidget.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpalette.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qcolor.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qrgb.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qbrush.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qmatrix.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpolygon.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qregion.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qtransform.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpainterpath.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qimage.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpixmap.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfont.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfontinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qcursor.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qkeysequence.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qevent.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qvector2d.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qvalidator.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qicon.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qslider.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qstyle.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qtabbar.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qrubberband.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qframe.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qlistview.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qcombobox.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrelationaltablemodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqltablemodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qtsqlversion.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QVector \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlQuery \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlDatabase \
+		database.h
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore database.h -o moc_database.cpp
+
+moc_sharedsettings.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QObject \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypetraits.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qflags.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_mips.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_x86.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_unix.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
+		sharedsettings.h
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore sharedsettings.h -o moc_sharedsettings.cpp
 
 moc_quagzipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -919,7 +1238,7 @@ moc_quagzipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		Zipper/Include/zlib.h \
 		Zipper/Include/zconf.h \
 		Zipper/Include/quagzipfile.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quagzipfile.h -o moc_quagzipfile.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quagzipfile.h -o moc_quagzipfile.cpp
 
 moc_quaziodevice.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -975,7 +1294,7 @@ moc_quaziodevice.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		Zipper/Include/zlib.h \
 		Zipper/Include/zconf.h \
 		Zipper/Include/quaziodevice.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quaziodevice.h -o moc_quaziodevice.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quaziodevice.h -o moc_quaziodevice.cpp
 
 moc_quazipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
@@ -1056,7 +1375,7 @@ moc_quazipfile.cpp: ../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
 		Zipper/Include/quazipnewinfo.h \
 		Zipper/Include/quazipfile.h
-	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quazipfile.h -o moc_quazipfile.cpp
+	/home/esaith/Qt/5.3/gcc_64/bin/moc $(DEFINES) -I/home/esaith/Qt/5.3/gcc_64/mkspecs/linux-g++ -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp -I/home/esaith/Libraries/OpenSSL_Compiled/include -I/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/Zipper/Include -I/home/esaith/Qt/5.3/gcc_64/include -I/home/esaith/Qt/5.3/gcc_64/include/QtNetwork -I/home/esaith/Qt/5.3/gcc_64/include/QtSql -I/home/esaith/Qt/5.3/gcc_64/include/QtCore Zipper/Include/quazipfile.h -o moc_quazipfile.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1184,6 +1503,7 @@ main.o: main.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDebug \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpSocket \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1191,7 +1511,6 @@ main.o: main.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDebug \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QList \
-		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpServer \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpserver.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qhostaddress.h \
@@ -1315,6 +1634,7 @@ server.o: server.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpSocket \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1322,7 +1642,6 @@ server.o: server.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QList \
-		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpServer \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpserver.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qhostaddress.h \
@@ -1445,6 +1764,7 @@ client.o: client.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/QTcpSocket \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../../Qt/5.3/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1452,7 +1772,6 @@ client.o: client.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QList \
-		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		shared.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o client.o client.cpp
@@ -1569,13 +1888,186 @@ task.o: task.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		shared.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QVector \
+		../../../Qt/5.3/gcc_64/include/QtCore/QString \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlRecord \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrecord.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsql.h \
+		database.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/QtSql \
+		../../../Qt/5.3/gcc_64/include/QtSql/QtSqlDepends \
+		../../../Qt/5.3/gcc_64/include/QtCore/QtCore \
+		../../../Qt/5.3/gcc_64/include/QtCore/QtCoreDepends \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qparallelanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpauseanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpropertyanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvariantanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeasingcurve.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsequentialanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qendian.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlibraryinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbuffer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdiriterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfileselector.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfilesystemwatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlockfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qloggingcategory.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocess.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qresource.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsavefile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsettings.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstandardpaths.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtemporarydir.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QScopedPointer \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtemporaryfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qurl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qurlquery.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qidentityproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsortfilterproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlistmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonarray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonvalue.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsondocument.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstracteventdispatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractnativeeventfilter.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasictimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmath.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetaobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimedata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectcleanuphandler.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedmemory.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsignalmapper.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsocketnotifier.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemsemaphore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtranslator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qwineventnotifier.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimedatabase.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimetype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfactoryinterface.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlibrary.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qplugin.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpluginloader.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/quuid.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstracttransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeventtransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfinalstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhistorystate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsignaltransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstatemachine.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qexception.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuture.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfutureinterface.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qresultstore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuturesynchronizer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuturewatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qreadwritelock.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsemaphore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthreadstorage.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qwaitcondition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydataops.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydatapointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbitarray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearraymatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcache.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcollator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcommandlineoption.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcommandlineparser.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcryptographichash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qelapsedtimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qline.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlinkedlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmargins.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmessageauthenticationcode.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qqueue.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrect.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsize.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregularexpression.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedvaluerollback.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstack.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextboundaryfinder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimeline.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimezone.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qxmlstream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtcoreversion.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldatabase.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldriver.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldriverplugin.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlerror.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlfield.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlindex.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlquery.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlresult.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlquerymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrelationaldelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qitemdelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qwidget.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpalette.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qcolor.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qrgb.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qbrush.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qmatrix.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpolygon.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qregion.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qtransform.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpainterpath.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qimage.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpixmap.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfont.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfontinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qcursor.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qkeysequence.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qevent.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qvector2d.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qvalidator.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qicon.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qslider.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qstyle.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qtabbar.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qrubberband.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qframe.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qlistview.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qcombobox.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrelationaltablemodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqltablemodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qtsqlversion.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlQuery \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlDatabase \
 		Zipper/Include/JlCompress.h \
 		Zipper/Include/quazip.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/QString \
-		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
 		../../../Qt/5.3/gcc_64/include/QtCore/QTextCodec \
-		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
 		Zipper/Include/zip.h \
 		Zipper/Include/zlib.h \
 		Zipper/Include/zconf.h \
@@ -1585,13 +2077,12 @@ task.o: task.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		Zipper/Include/quazipfileinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QByteArray \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDateTime \
-		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
 		Zipper/Include/quazipfile.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QIODevice \
 		Zipper/Include/quazipnewinfo.h \
-		../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo
+		../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo \
+		../../../Qt/5.3/gcc_64/include/QtCore/QDirIterator \
+		sharedsettings.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o task.o task.cpp
 
 shared.o: shared.cpp shared.h \
@@ -1753,6 +2244,363 @@ encrypto.o: encrypto.cpp encrypto.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
 		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o encrypto.o encrypto.cpp
+
+database.o: database.cpp database.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/QtSql \
+		../../../Qt/5.3/gcc_64/include/QtSql/QtSqlDepends \
+		../../../Qt/5.3/gcc_64/include/QtCore/QtCore \
+		../../../Qt/5.3/gcc_64/include/QtCore/QtCoreDepends \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypetraits.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qflags.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_mips.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_x86.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_unix.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qparallelanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpauseanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpropertyanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvariantanimation.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeasingcurve.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvector.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpoint.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvariant.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdebug.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextstream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlocale.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qset.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsequentialanimationgroup.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextcodec.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qendian.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlibraryinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatetime.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbuffer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdir.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfiledevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdiriterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfileselector.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QObject \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfilesystemwatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlockfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qloggingcategory.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocess.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qresource.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsavefile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsettings.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstandardpaths.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtemporarydir.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QScopedPointer \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtemporaryfile.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qurl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qurlquery.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qidentityproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsortfilterproxymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlistmodel.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonarray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonvalue.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsondocument.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qjsonobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstracteventdispatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractnativeeventfilter.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasictimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmath.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetaobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimedata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectcleanuphandler.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsharedmemory.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsignalmapper.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsocketnotifier.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemsemaphore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtranslator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qwineventnotifier.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimedatabase.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmimetype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfactoryinterface.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlibrary.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qplugin.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpluginloader.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/quuid.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstractstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qabstracttransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qeventtransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfinalstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhistorystate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsignaltransition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstate.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstatemachine.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qexception.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuture.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfutureinterface.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrunnable.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qresultstore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuturesynchronizer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfuturewatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qreadwritelock.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsemaphore.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthread.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthreadpool.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qthreadstorage.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qwaitcondition.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydataops.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydatapointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbitarray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearraymatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcache.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcollator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcommandlineoption.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcommandlineparser.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcryptographichash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qelapsedtimer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qline.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlinkedlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmargins.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmessageauthenticationcode.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qqueue.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrect.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsize.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregularexpression.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedvaluerollback.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstack.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextboundaryfinder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimeline.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtimezone.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qxmlstream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtcoreversion.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsql.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldatabase.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldriver.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqldriverplugin.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlerror.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlfield.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlindex.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrecord.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlquery.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlresult.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlquerymodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrelationaldelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qitemdelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qwidget.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpalette.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qcolor.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qrgb.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qbrush.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qmatrix.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpolygon.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qregion.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qtransform.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpainterpath.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qimage.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qpixmap.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfont.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qfontinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qcursor.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qkeysequence.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qevent.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qvector2d.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qvalidator.h \
+		../../../Qt/5.3/gcc_64/include/QtGui/qicon.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qslider.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qstyle.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qtabbar.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qrubberband.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qframe.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qlistview.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../../Qt/5.3/gcc_64/include/QtWidgets/qcombobox.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqlrelationaltablemodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qsqltablemodel.h \
+		../../../Qt/5.3/gcc_64/include/QtSql/qtsqlversion.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QVector \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlQuery \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlDatabase \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSqlRecord \
+		sharedsettings.h \
+		encrypto.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
+		../../../Qt/5.3/gcc_64/include/QtCore/QDebug \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/pem.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/e_os2.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/opensslconf.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/bio.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/crypto.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/stack.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/safestack.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/opensslv.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/ossl_typ.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/ebcdic.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/symhacks.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/evp.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/objects.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/obj_mac.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/asn1.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/bn.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/x509.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/buffer.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/ec.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/ecdsa.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/ecdh.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/rsa.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/dsa.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/dh.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/sha.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/x509_vfy.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/lhash.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/pkcs7.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/pem2.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/err.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/aes.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/conf.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/rand.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/engine.h \
+		../../../Libraries/OpenSSL_Compiled/include/openssl/ui.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o database.o database.cpp
+
+sharedsettings.o: sharedsettings.cpp sharedsettings.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QObject \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnamespace.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobal.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qconfig.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qfeatures.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtypetraits.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qsysinfo.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlogging.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qflags.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_mips.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_x86.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qatomic_unix.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmutex.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qnumeric.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstring.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qchar.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qrefcount.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qalgorithms.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiterator.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcoreevent.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmetatype.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qisenum.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qobject_impl.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/QStringList \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qiodevice.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpair.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qregexp.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qdebug.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qhash.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qmap.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qtextstream.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qlocale.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvariant.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qshareddata.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qvector.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qpoint.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qset.h \
+		../../../Qt/5.3/gcc_64/include/QtCore/qcontiguouscache.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sharedsettings.o sharedsettings.cpp
 
 JlCompress.o: Zipper/Include/JlCompress.cpp Zipper/Include/JlCompress.h \
 		Zipper/Include/quazip.h \
@@ -2573,6 +3421,12 @@ moc_client.o: moc_client.cpp
 
 moc_task.o: moc_task.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_task.o moc_task.cpp
+
+moc_database.o: moc_database.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_database.o moc_database.cpp
+
+moc_sharedsettings.o: moc_sharedsettings.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_sharedsettings.o moc_sharedsettings.cpp
 
 moc_quagzipfile.o: moc_quagzipfile.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_quagzipfile.o moc_quagzipfile.cpp

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core sql network
 QT       += network
 QT       -= gui
 
@@ -24,14 +24,18 @@ SOURCES += main.cpp \
     client.cpp \
     task.cpp \
     shared.cpp \
-    encrypto.cpp
+    encrypto.cpp \
+    database.cpp \
+    sharedsettings.cpp
 
 HEADERS += \
     server.h \
     client.h \
     task.h \
     shared.h \
-    encrypto.h
+    encrypto.h \
+    database.h \
+    sharedsettings.h
 
 # -- Zip -- Library
 # is this needed or libs folder will suffice
@@ -50,3 +54,8 @@ INCLUDEPATH += $${QUAZIPCODEDIR}
 HEADERS += $${QUAZIPCODEDIR}/*.h
 SOURCES += $${QUAZIPCODEDIR}/*.cpp
 SOURCES += $${QUAZIPCODEDIR}/*.c
+
+OTHER_FILES += \
+    bioAcqApp.config \
+    DB_PSWD.config \
+    dependency_.pblc
