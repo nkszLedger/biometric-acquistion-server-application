@@ -2082,6 +2082,7 @@ task.o: task.cpp ../../../Qt/5.3/gcc_64/include/QtCore/QDir \
 		Zipper/Include/quazipnewinfo.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFileInfo \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDirIterator \
+		../../../Qt/5.3/gcc_64/include/QtSql/QSql \
 		sharedsettings.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o task.o task.cpp
 
@@ -2491,7 +2492,6 @@ database.o: database.cpp database.h \
 		../../../Qt/5.3/gcc_64/include/QtSql/QSqlQuery \
 		../../../Qt/5.3/gcc_64/include/QtSql/QSqlDatabase \
 		../../../Qt/5.3/gcc_64/include/QtSql/QSqlRecord \
-		sharedsettings.h \
 		encrypto.h \
 		../../../Qt/5.3/gcc_64/include/QtCore/QFile \
 		../../../Qt/5.3/gcc_64/include/QtCore/QDebug \

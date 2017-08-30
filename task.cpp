@@ -13,6 +13,9 @@
 
 Task::Task()
 {
+    // initialise retrieval flag
+    auto_retrieve_ = false;
+
     // set the paths for temporary directories and repo directory
     temp_dir_.setPath(temp_path_global);
     repo_dir_.setPath(output_path_global);
@@ -24,9 +27,15 @@ Task::Task()
 void Task::run()
 {
     if( !auto_retrieve_  )
+    {
+        qDebug()<< "Is data retrieved?"<<auto_retrieve_;
         this->processData();
+    }
     else
+    {
+        qDebug()<< "Retreiving Data:" << auto_retrieve_;
         this->retrieveBiometricData();
+    }
 }
 
 bool Task::autoRetrieve() const
@@ -475,6 +484,7 @@ void Task::processData()
     {
         // - set file name
         temp_file_name =  new_files.at(i);
+        qDebug()<<" Temp FileName: "<<temp_file_name;
 
         // - skip dot and dotdot
         if(temp_file_name == "." || temp_file_name == ".." )
@@ -483,6 +493,7 @@ void Task::processData()
         {
             // -- get file name excludong client number that sent the file
             original_file_name = new_files.at(i).split("#").at(1);
+            qDebug()<<" original_file_name FileName: "<< original_file_name;
 
             // -- check if dependency
             if(original_file_name.contains(".dependency_"))
@@ -494,34 +505,41 @@ void Task::processData()
                 // --- set file name with repo path
                 repo_file.setFileName(output_path_global + original_file_name);
 
+                qDebug()<<"set file name with repo path: "<<output_path_global + original_file_name;
                 // --- check if file exists in repo
                 if(repo_file.exists())
                 {
+
                     // ---- if exists
                     // ---- decrypt folder on repo
                     repo_decrypt_file_name = DecryptFolder(output_path_global + original_file_name, \
                                                            true,\
                                                            repo_folder_key);
+                    qDebug()<<"decrypt folder on repo: "<<output_path_global + original_file_name;
 
                     // ---- unzip existing file
                     repo_decompressed_file_name = repo_decrypt_file_name+"_decompressed";
                     DecompressDir(repo_decrypt_file_name, repo_decompressed_file_name);
 
+                    qDebug()<<"Uzipped Existing file name: "<<repo_decompressed_file_name;
                     // ---- decrypt new folder
                     // ---- get passphrase
                     QString dependency_file_name = new_files[i];
                     dependency_file_name.remove(".zip");
                     dependency_file_name.insert(0, temp_dir_.absolutePath() + "/");
                     dependency_file_name.append(".dependency_");
+                    qDebug()<<"Dependency_file_name: "<<dependency_file_name;
+
                     QByteArray temp_folder_data = encryptor_.readFile(dependency_file_name);
                     QByteArray temp_folder_key = encryptor_.decryptRSA(pvt_key, temp_folder_data);
 
                      new_decrypt_file_name = DecryptFolder(temp_dir_.absolutePath() + "/" + new_files.at(i),\
                                                           false,\
                                                           temp_folder_key);
-
+                    qDebug()<<"New Decrypt File Name: "<<dependency_file_name ;
                     // ---- unzip new file
                     new_decompressed_file_name = new_decrypt_file_name+"_decompressed";
+                    qDebug()<<"New Decompressed File Name: "<<new_decompressed_file_name;
                     DecompressDir(new_decrypt_file_name, new_decompressed_file_name);
 
                     // ---- get basename
@@ -536,6 +554,7 @@ void Task::processData()
                     temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
                     CompressDir(temp_merged_file_name, repo_decompressed_file_name);
 
+                    qDebug()<<"Temp Merged_File Name: "<<temp_merged_file_name;
                     // ---- remove temporay files
                     deleteFile(dependency_file_name,                             !isDir);
                     deleteFile(new_decrypt_file_name,                            !isDir);
@@ -566,6 +585,7 @@ void Task::processData()
                     dependency_file_name.remove(".zip");
                     dependency_file_name.insert(0, temp_dir_.absolutePath() + "/");
                     dependency_file_name.append(".dependency_");
+                    qDebug()<<"dependency_file_name: "<<dependency_file_name;
 
                     QByteArray temp_folder_data = encryptor_.readFile(dependency_file_name);
                     QByteArray temp_folder_key = encryptor_.decryptRSA(pvt_key, temp_folder_data);
@@ -574,7 +594,7 @@ void Task::processData()
                                                           false,\
                                                           temp_folder_key);
 
-
+                    qDebug()<<"new_decrypt_file_name: "<<new_decrypt_file_name;
                     // encrypt folder using repo key & move to repo folder
                     EncryptFolder(new_decrypt_file_name, \
                                   (output_path_global + original_file_name),\
