@@ -206,28 +206,43 @@ void Client::TaskResult()
 
 void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 {
-    QFile *requested_modalities_zip_file = new QFile(requestedModalitiesFilePath);
+    qDebug() << "Client::sendEncryptedFile() - file path : " << requestedModalitiesFilePath;
 
-    qDebug() << "HERE 1";
-    if( requested_modalities_zip_file->exists() )
+    QByteArray data;
+
+    requested_biometrics_file_ = new QFile( requestedModalitiesFilePath );
+
+    if( requested_biometrics_file_->exists() )
     {
-        qDebug() << "HERE 2";
+        if (requested_biometrics_file_->open(QIODevice::ReadOnly))
+        {
+             data = requested_biometrics_file_->readAll();
+             requested_biometrics_file_->close();
+        }
 
-        if( requested_modalities_zip_file->readAll().isEmpty() )
-            qDebug() << "The byte array is empty";
+        if( data.isEmpty() )
+        {
+            qDebug() << "Client::sendEncryptedFile() - The byte array is empty ";
+        }
+        else
+        {
+            qDebug() << "Client::sendEncryptedFile() - Status of socket: " \
+                     << socket->write( data );
 
-        qDebug() << "Client::sendEncryptedFile() - Status of socket " \
-                 << socket->write(requested_modalities_zip_file->readAll());
+            qDebug() << "Client::sendEncryptedFile() - Status of flush: " \
+                     << socket->flush();
 
-        qDebug() << "HERE 3";
+            if( !socket->waitForBytesWritten() )
+                qDebug() << "Client::sendEncryptedFile() - Unable to flush...";
+            else
+                qDebug() << "Client::sendEncryptedFile() - Requested data sent";
+        }
+    }
+    else
+    {
+        qDebug() << "Client::sendEncryptedFile() - No file found to send";
     }
 
-    qDebug() << "HERE 4";
-    if( !socket->flush())
-        qDebug() << "Client::sendEncryptedFile() - Unable to flush...";
-    else
-        qDebug() << "Client::sendEncryptedFile() - Requested data sent";
-    qDebug() << "HERE 5";
     // free memory
-    delete requested_modalities_zip_file;
+    //delete requested_modalities_zip_file;
 }

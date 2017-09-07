@@ -2,6 +2,7 @@
 #define CLIENT_H
 
 #include <task.h>
+#include <QFile>
 #include <QDebug>
 #include <QObject>
 #include <QTcpSocket>
@@ -70,12 +71,14 @@ public slots:
     void sendEncryptedFile(QString requestedModalitiesFilePath);
 
 private:
+
     QString current_file_name_;
 
     QStringList file_names_;
     QStringList file_sizes_;
 
     QTcpSocket *socket;
+    QFile *requested_biometrics_file_;
 
     int no_files_;
     int size_counter_;

@@ -127,11 +127,12 @@ void Task::CompressDir(QString zipFile, QString directory)
     // call compress directory of folder
     if(JlCompress::compressDir(zipFile, directory))
     {
-        qDebug() << "Created" << zipFile;
+        qDebug() << "Task::CompressDir() - Created: "   << zipFile \
+                 << "Task::CompressDir() - File size: " << zipFile.size();
     }
     else
     {
-        qDebug() << "Could not create" << zipFile;
+        qDebug() << "Task::CompressDir() - Could not create" << zipFile;
     }
 }
 
@@ -206,36 +207,21 @@ void Task::retrieveBiometricData()
         }
     }
 
-    CompressDir("retrievedModalityData", file_path_ + "/requested_mods_combined");
+    CompressDir(file_path_ + "/retrievedModalityData.zip", file_path_ + "/requested_mods_combined");
 
     RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
     QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
 
-    EncryptFolder(file_path_ + "/retrievedModalityData.zip", \
-               file_path_ + "/retrievedModalityData.zip",
-               repo_folder_key);
+    EncryptFolder(file_path_ +"/retrievedModalityData.zip", \
+                    file_path_ + "/retrievedModalityData.zip",
+                    repo_folder_key);
+
+    emit requestedModalitiesReady(file_path_ + "/retrievedModalityData.zip");
 
     encryptor_.freeRSAKey(pvt_key);
 
-    QDirIterator *dir_it = new QDirIterator(file_path_);
-
-    while(dir_it->hasNext())
-    {
-        QString file_path_dir = dir_it->next();
-        if( file_path_dir == (file_path_ + "/requested_mods_combined") )
-        {
-            qDebug() << "Here mod1";
-            emit requestedModalitiesReady((file_path_ + "/requested_mods_combined"));
-            qDebug() << "Here mod2";
-        }
-    }
-
-    // free memory
-    delete dir_it;
-
 }
-
 void Task::packageAllRequestedModalities( QString modality )
 
 {
