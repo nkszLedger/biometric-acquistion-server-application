@@ -1,15 +1,17 @@
-#include <QDir>
 #include "task.h"
 #include "shared.h"
+
+#include <QDir>
+#include <QSql>
 #include <QVector>
 #include <QString>
 #include <QSqlRecord>
 #include <database.h>
 #include <JlCompress.h>
 #include <QDirIterator>
-#include <QSql>
 #include <QSqlDatabase>
 #include <sharedsettings.h>
+#include <QRegularExpression>
 
 Task::Task()
 {
@@ -174,7 +176,10 @@ void Task::EncryptFolder(QString inputFileName,\
     // load passphrase
     QByteArray encrypted_file = encryptor_.encryptAES(passphrase, file, false);
 
-    // write decrypted file
+    // delete input file
+    deleteFile(inputFileName, false);
+
+    // write encrypted file
     encryptor_.writeFile(outputFileName, encrypted_file);
 }
 
@@ -211,7 +216,7 @@ void Task::retrieveBiometricData()
 
     RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
-    QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
+    QByteArray repo_folder_key = "MDSBRMP";// encryptor_.decryptRSA(pvt_key, repo_folder_data);
 
     EncryptFolder(file_path_ +"/retrievedModalityData.zip", \
                     file_path_ + "/retrievedModalityData.zip",
@@ -219,11 +224,15 @@ void Task::retrieveBiometricData()
 
     emit requestedModalitiesReady(file_path_ + "/retrievedModalityData.zip");
 
+    // clean up directory
+    //QRegularExpression regex("*/_decompressed");
+    deleteFile(file_path_ + "/requested_mods_combined", true);
+    deleteFile(file_path_ + "/retrievedModalityData.zip", false);
+
     encryptor_.freeRSAKey(pvt_key);
 
 }
 void Task::packageAllRequestedModalities( QString modality )
-
 {
     QDirIterator *file_path_it = new QDirIterator( file_path_, \
                                                    QStringList() << getModalityName(modality));

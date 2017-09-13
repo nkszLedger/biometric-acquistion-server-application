@@ -1,9 +1,10 @@
-#include <QFile>
-#include <QString>
 #include "client.h"
 #include <shared.h>
-#include <QFileInfo>
 #include <task.h>
+#include <QFile>
+#include <QString>
+#include <QFileInfo>
+#include <QIODevice>
 
 Client::Client(QObject *parent) :
     QObject(parent)
@@ -169,6 +170,10 @@ void Client::readyRead()
         qDebug() <<" Client::readyRead() - With header " << in_line;
         retrieveRequestedBioModalities(in_line);
     }
+    else if(QString::compare(in_line.mid(0, 3), "#!6", Qt::CaseInsensitive) == 0)
+    {
+
+    }
     else
     {
         // - read data
@@ -206,11 +211,12 @@ void Client::TaskResult()
 
 void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 {
-    qDebug() << "Client::sendEncryptedFile() - file path : " << requestedModalitiesFilePath;
-
     QByteArray data;
 
     requested_biometrics_file_ = new QFile( requestedModalitiesFilePath );
+
+    qDebug() << "Client::sendEncryptedFile() - file QIODevice:path : " << requestedModalitiesFilePath \
+             << " with size: " << requested_biometrics_file_->size();
 
     if( requested_biometrics_file_->exists() )
     {
@@ -226,9 +232,24 @@ void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
         }
         else
         {
+            QString data_size = QString::number(data.size());
+            QString notification_header_and_datas_size = "#!4" + data_size;
+
+            // notify receiver of the file size
+            socket->write( notification_header_and_datas_size.toStdString().c_str() );
+
+            qDebug() << "Client::sendEncryptedFile() - Notification Status of flush: " \
+                     << socket->flush();
+
+//            if( !socket->waitForBytesWritten() )
+//                qDebug() << "Client::sendEncryptedFile() - Unable to flush notification";
+//            else
+//                qDebug() << "Client::sendEncryptedFile() - notification sent";
+
+            // -----------------------------------------------------------------------
+
             qDebug() << "Client::sendEncryptedFile() - Status of socket: " \
                      << socket->write( data );
-
             qDebug() << "Client::sendEncryptedFile() - Status of flush: " \
                      << socket->flush();
 

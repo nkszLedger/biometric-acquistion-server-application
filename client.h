@@ -44,7 +44,12 @@ public:
      * \param index
      */
     void setFileName(int index);
+
 signals:
+    /*!
+     * \brief file_size_signal
+     */
+    void file_size_signal();
 
 public slots:
     /*!
