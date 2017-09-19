@@ -50,7 +50,7 @@ void Server::loadconfigFile()
 void Server::StartServer()
 {
     //listen for incomming connections
-    if(listen(QHostAddress::Any,1234))
+    if( listen(QHostAddress::Any, 1234) )
     {
         qDebug() << "Server Started";
     }
@@ -59,12 +59,24 @@ void Server::StartServer()
         qDebug() << "Server NOT Started!";
     }
 }
+void Server::serverOnClose()
+{
+    // Check if client is instatiated
+    if( client_ )
+    {
+        client_->notifyClientOnClose();
+    }
+
+    // if there's no client than theres no client to notify (?)
+}
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
     qDebug() << "socketDescriptor - " << socketDescriptor;
+
     // create a new client
-    Client *client = new Client(this);
+    client_ = new Client(this);
+
     // tag client to new id
-    client->SetSocket(socketDescriptor);
+    client_->SetSocket(socketDescriptor);
 }

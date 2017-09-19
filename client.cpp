@@ -48,6 +48,14 @@ void Client::disconnected()
     qDebug() << "client disconnected";
 }
 
+void Client::notifyClientOnClose()
+{
+    // notify client on server going down
+    socket->write( QString("#!0").toStdString().c_str() );
+
+    qDebug() << "Client::notifyClientOnClose() - Notification Status of flush: " \
+             << socket->flush();
+}
 
 /*!
  * \brief Client::getHeader Header begins with '#!1'
@@ -142,7 +150,6 @@ void Client::getEncryptedFiles(QByteArray data)
             connect(mytask,SIGNAL(completed()),SLOT(TaskResult()), Qt::QueuedConnection);
             QThreadPool::globalInstance()->start(mytask);
         }
-
     }
 }
 
@@ -215,7 +222,8 @@ void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 
     requested_biometrics_file_ = new QFile( requestedModalitiesFilePath );
 
-    qDebug() << "Client::sendEncryptedFile() - file QIODevice:path : " << requestedModalitiesFilePath \
+    qDebug() << "Client::sendEncryptedFile() - file QIODevice:path : " \
+             << requestedModalitiesFilePath \
              << " with size: " << requested_biometrics_file_->size();
 
     if( requested_biometrics_file_->exists() )

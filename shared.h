@@ -13,7 +13,8 @@ enum biometricModality
     EAR2D        = 3,
     EAR3D        = 4,
     FOOTPRINTS   = 5,
-    PALMPRINTS   = 6
+    PALMPRINTS   = 6,
+    MICROSCOPE   = 7
 };
 
 

@@ -45,6 +45,11 @@ public:
      */
     void setFileName(int index);
 
+    /*!
+     * \brief notifyClientOnClose
+     */
+    void notifyClientOnClose();
+
 signals:
     /*!
      * \brief file_size_signal
@@ -95,7 +100,6 @@ private:
      * \param in_line
      */
     void retrieveRequestedBioModalities(QString in_line);
-
 };
 
 #endif // CLIENT_H

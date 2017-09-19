@@ -5,7 +5,6 @@
 #include <task.h>
 #include <encrypto.h>
 
-
 /*!
  * \brief main
  * \param argc
@@ -18,6 +17,8 @@ int main(int argc, char *argv[])
 
     Server server;
     server.StartServer();
+
+    //QObject::connect(&a, SIGNAL(aboutToQuit()),&server, SLOT(serverOnClose()) );
 
     return a.exec();
 }

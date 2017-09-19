@@ -20,6 +20,7 @@ public:
      * \brief loadconfigFile
      */
     void loadconfigFile();
+
     /*!
      * \brief StartServer
      */
@@ -36,8 +37,15 @@ signals:
 
 public slots:
 
+    /*!
+     * \brief notifyClientOnClose
+     */
+    void serverOnClose();
+
 private:
     QString output_path_;
+
+    Client *client_;
 
 };
 
