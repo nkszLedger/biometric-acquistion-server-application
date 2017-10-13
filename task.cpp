@@ -31,12 +31,12 @@ void Task::run()
 {
     if( !auto_retrieve_  )
     {
-        qDebug()<< "Is data retrieved?"<<auto_retrieve_;
+        qDebug()<< "Is data retrieved? "<< auto_retrieve_;
         this->processData();
     }
     else
     {
-        qDebug()<< "Retreiving Data:" << auto_retrieve_;
+        qDebug()<< "Retreiving Data:"  << auto_retrieve_;
         this->retrieveBiometricData();
     }
 }
@@ -223,58 +223,65 @@ void Task::retrieveBiometricData()
     {
         for( int i = 0; i < requested_modalities_list_.size(); i++ )
         {
+            qDebug() << "Going to tRAVERSE DIR...";
             traverseDirectory( requested_modalities_list_.at(i) );
+            qDebug() << "tRAVERSED DIR";
+
             // Check for empty 'requested data directories and remove
             // Combine folders into one directory
             packageAllRequestedModalities(requested_modalities_list_.at(i));
+                        qDebug() << "Packaged Modalities";
         }
-    }
 
-    CompressDir(file_path_ + "/retrievedModalityData.zip", file_path_ + "/requested_mods_combined");
+        CompressDir(file_path_ + "/retrievedModalityData.zip", file_path_ + "/requested_mods_combined");
 
-    RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
-    QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
-    QByteArray repo_folder_key = "MDSBRMP";// encryptor_.decryptRSA(pvt_key, repo_folder_data);
+        RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
+        QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
+        QByteArray repo_folder_key = "MDSBRMP";// encryptor_.decryptRSA(pvt_key, repo_folder_data);
 
-    EncryptFolder(file_path_ +"/retrievedModalityData.zip", \
-                    file_path_ + "/retrievedModalityData.zip",
-                    repo_folder_key);
+        EncryptFolder(file_path_ +"/retrievedModalityData.zip", \
+                        file_path_ + "/retrievedModalityData.zip",
+                        repo_folder_key);
 
-    emit requestedModalitiesReady(file_path_ + "/retrievedModalityData.zip");
+        emit requestedModalitiesReady(file_path_ + "/retrievedModalityData.zip");
 
-    // clean up directory
-    QRegularExpression regex("\\d+.zip_repo_temp.zip_decompressed");
+        // clean up directory
+        QRegularExpression regex("\\d+.zip_repo_temp.zip_decompressed");
 
-    QDirIterator *file_path_it = new QDirIterator( file_path_, \
-                                                   ( QDir::Dirs | \
-                                                     QDir::NoDot | \
-                                                     QDir::NoDotDot | \
-                                                     QDir::NoDotAndDotDot \
-                                                   ));
+        QDirIterator *file_path_it = new QDirIterator( file_path_, \
+                                                       ( QDir::Dirs | \
+                                                         QDir::NoDot | \
+                                                         QDir::NoDotDot | \
+                                                         QDir::NoDotAndDotDot \
+                                                       ));
 
-    while( file_path_it->hasNext() )
-    {
-        QString directory_name = file_path_it->next();
-
-        qDebug() << "Task::retrieveBiometricData() - removing " << directory_name
-                 << " " << directory_name.split(file_path_+ "/").at(1) ;
-
-        QRegularExpressionMatch match = regex.match( directory_name.split(file_path_+"/").at(1) );
-
-        if( match.hasMatch() )
+        while( file_path_it->hasNext() )
         {
-            deleteFile(directory_name, true );
+            QString directory_name = file_path_it->next();
+
+            qDebug() << "Task::retrieveBiometricData() - removing " << directory_name
+                     << " " << directory_name.split(file_path_+ "/").at(1) ;
+
+            QRegularExpressionMatch match = regex.match( directory_name.split(file_path_+"/").at(1) );
+
+            if( match.hasMatch() )
+            {
+                deleteFile(directory_name, true );
+            }
         }
+
+        // free memory
+        delete file_path_it;
+
+        deleteFile(file_path_ + "/requested_mods_combined", true);
+        deleteFile(file_path_ + "/retrievedModalityData.zip", false);
+
+        encryptor_.freeRSAKey(pvt_key);
     }
-
-    // free memory
-    delete file_path_it;
-
-    deleteFile(file_path_ + "/requested_mods_combined", true);
-    deleteFile(file_path_ + "/retrievedModalityData.zip", false);
-
-    encryptor_.freeRSAKey(pvt_key);
-
+    else
+    {
+        qDebug() << "Task::retrieveBiometricData() - requested modality list empty";
+    }
 }
 void Task::packageAllRequestedModalities( QString modality )
 {
@@ -302,31 +309,39 @@ void Task::packageAllRequestedModalities( QString modality )
 
 void Task::traverseDirectory( QString modality )
 {
+    qDebug() << "Modality: " << modality;
+
     QString temp_path;
     unsigned int counter = 1;
     QString sub_dir_temp_path;
     QString repo_decrypt_file_name;
     QString repo_decompressed_file_name;
 
-    QDirIterator *sub_directory_it;
+    qDebug() << "Modality Name: " << getModalityName(modality);
     QString temp_requested_modalities_dir_path = file_path_ + "/" + getModalityName(modality);
+    qDebug() << "temp_requested_modalities_dir_path: " << temp_requested_modalities_dir_path;
+
     QDirIterator file_path_it( file_path_, QDir::Files);
 
     QDir requested_modalities(file_path_);
     requested_modalities.mkdir(temp_requested_modalities_dir_path);
 
+    qDebug() << "Reading keys... ";
     RSA* pvt_key = encryptor_.getPrivateKey("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/dependency_.prvt");
     QByteArray repo_folder_data = encryptor_.readFile("/home/esaith/Documents/MinorsProject/BiometricAcquistionServerApp/DEPENDENCIES/Briefcase.dependency_");
     QByteArray repo_folder_key = encryptor_.decryptRSA(pvt_key, repo_folder_data);
 
     encryptor_.freeRSAKey(pvt_key);
 
+    QDirIterator *sub_directory_it;
+    qDebug() << "Going to decrypt & decompress...";
     // decrypt & decompress
     while (file_path_it.hasNext())
     {
         temp_path = file_path_it.next();
         QStringList temp_path_info = temp_path.split("/");
         QString participant_id = temp_path_info.last().split(".zip").first();
+        qDebug() << "Participant ID: " << participant_id;
 
         repo_decrypt_file_name = DecryptFolder( temp_path, \
                                                 true,\
@@ -434,6 +449,8 @@ QString Task::getModalityName(QString modality)
     switch( modality.toInt())
     {
         case EAR2D          : return "Ear2D";
+        break;
+        case IRIS           : return "Iris";
         break;
         case EAR3D          : return "Ear3D";
         break;
