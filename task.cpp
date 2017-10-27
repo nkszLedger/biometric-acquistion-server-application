@@ -1,5 +1,4 @@
 #include "task.h"
-#include "shared.h"
 
 #include <QDir>
 #include <QSql>
@@ -444,9 +443,9 @@ void Task::traverseDirectory( QString modality )
     delete sub_directory_it;
 }
 
-QString Task::getModalityName(QString modality)
+QString Task::getModalityName(QString modalityNumber)
 {
-    switch( modality.toInt())
+    switch( modalityNumber.toInt())
     {
         case EAR2D          : return "Ear2D";
         break;
@@ -561,6 +560,7 @@ void Task::processData()
             // -- get file name excluding client number that sent the file
             target_file_name   = getModalityName( new_files.at(i).split("#").at(0) );
             original_file_name = new_files.at(i).split("#").at(1);
+            qDebug()<<" target_file_name FileName: "<< target_file_name;
             qDebug()<<" original_file_name FileName: "<< original_file_name;
 
             // -- check if dependency
@@ -617,13 +617,11 @@ void Task::processData()
                     qDebug()<<"New Decompressed File Name: "<<new_decompressed_file_name;
                     DecompressDir(new_decrypt_file_name, new_decompressed_file_name);
 
-                    // ---- get basename
-                    temp_file.setFile(target_file_name);
+                    // *************Crucial for merging existing folders******
 
-                    // ---- merge folders
-                    mergeFolders(temp_file.baseName(),\
-                                 new_decompressed_file_name,\
-                                 repo_decompressed_file_name);
+                    mergeAllExistingModalities(new_decompressed_file_name, repo_decompressed_file_name );
+
+                    //**********************************************************
 
                     // ---- compress folder
                     temp_merged_file_name = repo_decompressed_file_name + "_compressed.zip";
@@ -689,6 +687,71 @@ void Task::processData()
     }
     // free memory
     encryptor_.freeRSAKey(pvt_key);
+}
+
+void Task::mergeFoldersForModality(QString modalityNumber, \
+                                        QString inputFilePath,\
+                                        QString outputFilePath)
+{
+    QString expected_modality_folder = getModalityName(modalityNumber) ;
+
+    QDir dir( inputFilePath + "/" + expected_modality_folder );
+
+    if( dir.exists() )
+    {
+        mergeFolders(expected_modality_folder,\
+                        inputFilePath,\
+                        outputFilePath);
+
+    }
+    else
+    {
+        qDebug() << "Task::mergeFoldersForModality() - Could not find folder: " << expected_modality_folder;
+    }
+}
+
+void Task::mergeAllExistingModalities( QString new_decompressed_file_name,\
+                                       QString repo_decompressed_file_name)
+{
+    //**********************************************************
+    // ---- get basename
+    //temp_file.setFile(target_file_name);
+
+    // ---- merge folders
+    /*mergeFolders(temp_file.baseName(),\
+                 new_decompressed_file_name,\
+                 repo_decompressed_file_name);*/
+
+    //**********************************************************
+
+    mergeFoldersForModality(QString::number(IRIS), \
+                                    new_decompressed_file_name, \
+                                    repo_decompressed_file_name );
+
+    mergeFoldersForModality(QString::number(FINGERPRINTS), \
+                                    new_decompressed_file_name,\
+                                    repo_decompressed_file_name );
+
+    mergeFoldersForModality(QString::number(EAR2D), \
+                                    new_decompressed_file_name, \
+                                    repo_decompressed_file_name );
+
+    mergeFoldersForModality(QString::number(EAR3D), \
+                                    new_decompressed_file_name, \
+                                    repo_decompressed_file_name );
+
+    mergeFoldersForModality(QString::number(FOOTPRINTS), \
+                                    new_decompressed_file_name, \
+                                        repo_decompressed_file_name );
+
+    mergeFoldersForModality(QString::number(PALMPRINTS), \
+                                    new_decompressed_file_name, \
+                                    repo_decompressed_file_name );
+
+    mergeFoldersForModality(QString::number(MICROSCOPE), \
+                                    new_decompressed_file_name,
+                                    repo_decompressed_file_name );
+
 }
 
 bool Task::copyDir(const QString source, const QString destination, const bool override)

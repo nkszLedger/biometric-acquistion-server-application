@@ -1,6 +1,8 @@
 ﻿#ifndef TASK_H
 #define TASK_H
 
+#include "shared.h"
+
 #include <QDir>
 #include <QDebug>
 #include <QObject>
@@ -113,7 +115,7 @@ private:
      * \param modality
      * \return
      */
-    QString getModalityName(QString modality);
+    QString getModalityName(QString modalityNumber);
     /*!
      * \brief getRequesteModalities
      */
@@ -148,6 +150,23 @@ private:
      * \return
      */
     QString getGenderAndDOB(QString participant_id);
+
+    /*!
+     * \brief mergeFoldersForModality
+     * \param modalityNumber
+     * \param inputFilePath
+     * \param outputFilePath
+     */
+    void mergeFoldersForModality(QString modalityNumber, \
+                                        QString inputFilePath, \
+                                        QString outputFilePath);
+
+    /*!
+     * \brief mergeAllExistingBiometrics
+     * \param new_decompressed_file_name
+     * \param repo_decompressed_file_name
+     */
+    void mergeAllExistingModalities(QString new_decompressed_file_name, QString repo_decompressed_file_name);
 };
 
 #endif // TASK_H
