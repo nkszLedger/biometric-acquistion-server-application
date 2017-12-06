@@ -200,7 +200,7 @@ void Task::EncryptFolder(QString inputFileName,\
     encryptor_.writeFile(outputFileName, encrypted_file);
 }
 
-void Task::deleteFile(QString fileName, bool isDir)
+void Task:: deleteFile(QString fileName, bool isDir)
 {
     if(isDir)
     {
@@ -245,7 +245,7 @@ void Task::retrieveBiometricData()
         emit requestedModalitiesReady(file_path_ + "/retrievedModalityData.zip");
 
         // clean up directory
-        QRegularExpression regex("\\d+.zip_repo_temp.zip_decompressed");
+        QRegularExpression regex("\\d+\\-\\d+\\_\\d+\\-\\d+\\-\\d+.zip_repo_temp.zip_decompressed");
 
         QDirIterator *file_path_it = new QDirIterator( file_path_, \
                                                        ( QDir::Dirs | \
@@ -339,7 +339,12 @@ void Task::traverseDirectory( QString modality )
     {
         temp_path = file_path_it.next();
         QStringList temp_path_info = temp_path.split("/");
-        QString participant_id = temp_path_info.last().split(".zip").first();
+
+        /*! TODO
+         *
+         */
+        QString participant_id = temp_path_info.last().split("-").first();
+
         qDebug() << "Participant ID: " << participant_id;
 
         repo_decrypt_file_name = DecryptFolder( temp_path, \
@@ -418,7 +423,7 @@ void Task::traverseDirectory( QString modality )
                 qDebug() << "Task::traverseDirectory() - Copied ear2D @, " \
                          << sub_dir_temp_path;
             }
-            else if( path_info.last() == "EAR3D" && modality.toInt() == EAR3D )
+            else if( path_info.last() == "Ear3D" && modality.toInt() == EAR3D )
             {
                 copyDir( sub_dir_temp_path, \
                          new_modality_dir_for_participant  , \
@@ -460,6 +465,9 @@ QString Task::getModalityName(QString modalityNumber)
         case FINGERPRINTS   : return "Fingerprints";
         break;
         case MICROSCOPE     : return "Microscope";
+        break;
+        default: // should never reach here
+            qDebug() << "Task::getModalityName(): Fatal error - Unknown Modality...";
         break;
     }
 }

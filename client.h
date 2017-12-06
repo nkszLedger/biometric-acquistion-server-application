@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QThreadPool>
+#include <QByteArray>
 
 #include <QList>
 #include <QStringList>
@@ -80,6 +81,11 @@ public slots:
      */
     void sendEncryptedFile(QString requestedModalitiesFilePath);
 
+    /*!
+     * \brief uploadRequestedBioModalities
+     */
+    void uploadRequestedBioModalities();
+
 private:
 
     QString current_file_name_;
@@ -89,6 +95,8 @@ private:
 
     QTcpSocket *socket;
     QFile *requested_biometrics_file_;
+
+    QByteArray requested_data_;
 
     int no_files_;
     int size_counter_;

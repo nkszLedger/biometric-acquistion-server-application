@@ -179,7 +179,10 @@ void Client::readyRead()
     }
     else if(QString::compare(in_line.mid(0, 3), "#!6", Qt::CaseInsensitive) == 0)
     {
+        if( !requested_data_.isEmpty() )
+            uploadRequestedBioModalities();
 
+        requested_data_.clear();
     }
     else
     {
@@ -210,6 +213,29 @@ void Client::retrieveRequestedBioModalities(QString in_line)
     QThreadPool::globalInstance()->start(mytask);
 }
 
+
+void Client::uploadRequestedBioModalities()
+{
+    // -----------------------------------------------------------------------
+    qDebug() << "Client::sendEncryptedFile() - Status of socket: " \
+             << socket->write( requested_data_ );
+    qDebug() << "Client::sendEncryptedFile() - Status of flush: " \
+             << socket->flush();
+
+    if( !socket->waitForBytesWritten() )
+    {
+        qDebug() << "Client::sendEncryptedFile() - Unable to flush...";
+        qDebug() << "Client::sendEncryptedFile() - Sending a fail to send signal: " \
+                 << socket->write( QString("#!0").toLatin1() );
+        qDebug() << "Client::sendEncryptedFile() - Status of flush for failed signal: " \
+                 << socket->flush();
+    }
+    else
+    {
+        qDebug() << "Client::sendEncryptedFile() - Requested data sent";
+    }
+}
+
 void Client::TaskResult()
 {
     qDebug() << "HERE 1";
@@ -218,7 +244,7 @@ void Client::TaskResult()
 
 void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 {
-    QByteArray data;
+    requested_data_.clear();
 
     requested_biometrics_file_ = new QFile( requestedModalitiesFilePath );
 
@@ -230,41 +256,27 @@ void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
     {
         if (requested_biometrics_file_->open(QIODevice::ReadOnly))
         {
-             data = requested_biometrics_file_->readAll();
+             requested_data_ = requested_biometrics_file_->readAll();
              requested_biometrics_file_->close();
         }
 
-        if( data.isEmpty() )
+        if( requested_data_.isEmpty() )
         {
             qDebug() << "Client::sendEncryptedFile() - The byte array is empty ";
         }
         else
         {
-            QString data_size = QString::number(data.size());
+            QString data_size = QString::number(requested_data_.size());
             QString notification_header_and_datas_size = "#!4" + data_size;
 
+            qDebug() << "Client::sendEncryptedFile() - Notification header to be sent: " \
+                     << notification_header_and_datas_size;
+
             // notify receiver of the file size
-            socket->write( notification_header_and_datas_size.toStdString().c_str() );
+            socket->write( QString(notification_header_and_datas_size).toLatin1() );
 
             qDebug() << "Client::sendEncryptedFile() - Notification Status of flush: " \
                      << socket->flush();
-
-//            if( !socket->waitForBytesWritten() )
-//                qDebug() << "Client::sendEncryptedFile() - Unable to flush notification";
-//            else
-//                qDebug() << "Client::sendEncryptedFile() - notification sent";
-
-            // -----------------------------------------------------------------------
-
-            qDebug() << "Client::sendEncryptedFile() - Status of socket: " \
-                     << socket->write( data );
-            qDebug() << "Client::sendEncryptedFile() - Status of flush: " \
-                     << socket->flush();
-
-            if( !socket->waitForBytesWritten() )
-                qDebug() << "Client::sendEncryptedFile() - Unable to flush...";
-            else
-                qDebug() << "Client::sendEncryptedFile() - Requested data sent";
         }
     }
     else
