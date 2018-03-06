@@ -20,7 +20,8 @@ Client::Client(QObject *parent) :
     no_files_ = 0;
     size_counter_ = 0;
     file_size_counter_ = 0;
-    current_file_index_ = 0;   
+    current_file_index_ = 0;
+
 }
 
 void Client::SetSocket(qintptr socketDescriptor)
@@ -179,10 +180,10 @@ void Client::readyRead()
     }
     else if(QString::compare(in_line.mid(0, 3), "#!6", Qt::CaseInsensitive) == 0)
     {
-        if( !requested_data_.isEmpty() )
+        if( !requested_data_->isEmpty() )
             uploadRequestedBioModalities();
 
-        requested_data_.clear();
+        requested_data_->clear();
     }
     else
     {
@@ -218,7 +219,7 @@ void Client::uploadRequestedBioModalities()
 {
     // -----------------------------------------------------------------------
     qDebug() << "Client::sendEncryptedFile() - Status of socket: " \
-             << socket->write( requested_data_ );
+             << socket->write( *requested_data_ );
     qDebug() << "Client::sendEncryptedFile() - Status of flush: " \
              << socket->flush();
 
@@ -244,8 +245,6 @@ void Client::TaskResult()
 
 void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 {
-    requested_data_.clear();
-
     requested_biometrics_file_ = new QFile( requestedModalitiesFilePath );
 
     qDebug() << "Client::sendEncryptedFile() - file QIODevice:path : " \
@@ -254,19 +253,21 @@ void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 
     if( requested_biometrics_file_->exists() )
     {
-        if (requested_biometrics_file_->open(QIODevice::ReadOnly))
+        if ( requested_biometrics_file_->open(QIODevice::ReadOnly) )
         {
-             requested_data_ = requested_biometrics_file_->readAll();
+             requested_data_ = new QByteArray(QByteArray::fromRawData( requested_biometrics_file_->readAll(), \
+                                                        requested_biometrics_file_->size() ));
+
              requested_biometrics_file_->close();
         }
 
-        if( requested_data_.isEmpty() )
+        if( requested_data_->isEmpty() )
         {
             qDebug() << "Client::sendEncryptedFile() - The byte array is empty ";
         }
         else
         {
-            QString data_size = QString::number(requested_data_.size());
+            QString data_size = QString::number( requested_data_->size() );
             QString notification_header_and_datas_size = "#!4" + data_size;
 
             qDebug() << "Client::sendEncryptedFile() - Notification header to be sent: " \
@@ -286,4 +287,7 @@ void Client::sendEncryptedFile(QString requestedModalitiesFilePath)
 
     // free memory
     //delete requested_modalities_zip_file;
+
+    requested_data_->clear();
+    delete requested_data_;
 }

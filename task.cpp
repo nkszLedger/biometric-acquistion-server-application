@@ -432,7 +432,8 @@ void Task::traverseDirectory( QString modality )
                          << sub_dir_temp_path;
             }
             // Copy data to its corresponding directory";
-            if( path_info.last() == "Microscope" && modality.toInt() == MICROSCOPE )
+            if( (path_info.last() == "Microscope") && \
+                    modality.toInt() == MICROSCOPE )
             {
                 copyDir( sub_dir_temp_path, \
                          new_modality_dir_for_participant, \

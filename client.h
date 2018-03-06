@@ -96,7 +96,7 @@ private:
     QTcpSocket *socket;
     QFile *requested_biometrics_file_;
 
-    QByteArray requested_data_;
+    QByteArray *requested_data_;
 
     int no_files_;
     int size_counter_;
