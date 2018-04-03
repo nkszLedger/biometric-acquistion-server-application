@@ -158,7 +158,8 @@ void Client::readyRead()
 {  
     // read all data
     QByteArray data = socket->readAll();
-    // set to QString
+
+    //set to QString
     QString in_line = data;
 
     // check if Header (Meta Data)
@@ -205,8 +206,8 @@ void Client::retrieveRequestedBioModalities(QString in_line)
     //Time Consumer Functionality
     Task *mytask = new Task();
     mytask->setSocketInput(socket->socketDescriptor());
-    mytask->setAutoDelete(true);
-    mytask->setAutoRetrieve(requested_modalities_list,true);
+    //mytask->setAutoDelete(true);
+    //mytask->setAutoRetrieve(requested_modalities_list,true);
     connect( mytask, \
              SIGNAL(requestedModalitiesReady(QString)), \
              SLOT(sendEncryptedFile(QString)), Qt::QueuedConnection);
@@ -240,7 +241,11 @@ void Client::uploadRequestedBioModalities()
 void Client::TaskResult()
 {
     qDebug() << "HERE 1";
-    socket->write(QString("#!3").toStdString().c_str());
+    socket->write(QString("user mds-admin").toStdString().c_str());
+    socket->write(QString("pass I1by\&UoEJktKD\^\$I").toStdString().c_str());
+    socket->write(QString("cwd /brmin-share").toStdString().c_str());
+    socket->write(QString("list").toStdString().c_str());
+
 }
 
 void Client::sendEncryptedFile(QString requestedModalitiesFilePath)

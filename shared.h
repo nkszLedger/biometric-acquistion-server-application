@@ -5,6 +5,8 @@
 
 extern QString temp_path_global;
 extern QString output_path_global;
+extern QString storage_ip_address;
+extern QString data_file_path;
 
 enum biometricModality
 {
@@ -15,6 +17,12 @@ enum biometricModality
     FOOTPRINTS   = 5,
     PALMPRINTS   = 6,
     MICROSCOPE   = 7
+};
+
+enum errors
+{
+    SUCCESSFUL   = 0,
+    REDIRECT     = 302
 };
 
 

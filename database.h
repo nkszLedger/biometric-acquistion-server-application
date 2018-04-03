@@ -97,11 +97,11 @@ public:
     * \param result
     * \return
     */
-    bool select(QString table,
-                QVector<QString> &select_columns,
-                QVector<QString> &column_list,
-                QVector<QString> &value_list,
-                QVector<QSqlRecord> &result);
+    bool select(QString table, \
+                QVector<QString> &select_columns, \
+                QVector<QSqlRecord> &result, \
+                QVector<QString> column_list = QVector<QString>(), \
+                QVector<QString> value_list  = QVector<QString>() );
 
 
     // *************** End Of Helper Functions *****************
